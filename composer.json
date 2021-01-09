@@ -1,0 +1,34 @@
+{
+    "name": "zenstruck/mailer-test",
+    "description": "Alternative, opinionated helpers for testing emails sent with symfony/mailer.",
+    "homepage": "https://github.com/zenstruck/mailer-test",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["mailer", "symfony", "test"],
+    "authors": [
+        {
+            "name": "Kevin Bond",
+            "email": "kevinbond@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "symfony/framework-bundle": "^4.4|^5.0",
+        "symfony/mailer": "^4.4|^5.0",
+        "zenstruck/callback": "^1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5.0",
+        "symfony/phpunit-bridge": "^5.2"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "Zenstruck\\Mailer\\Test\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Zenstruck\\Mailer\\Test\\Tests\\": "tests/" }
+    }
+}

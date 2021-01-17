@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\Email1;
+use Zenstruck\Mailer\Test\Tests\Fixture\Kernel;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -122,13 +123,35 @@ final class InteractsWithMailerTest extends KernelTestCase
     /**
      * @test
      */
-    public function profiler_must_be_enabled(): void
+    public function profiler_must_be_enabled_after_5_2(): void
     {
+        if (Kernel::VERSION_ID < 50200) {
+            // profile needs to be enabled in 5.2+
+            $this->markTestSkipped();
+        }
+
         self::bootKernel(['environment' => 'no_profiler']);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Mailer and/or profiling not enabled');
 
         $this->mailer();
+    }
+
+    /**
+     * @test
+     */
+    public function profiler_does_not_need_to_enabled_prior_to_5_2(): void
+    {
+        if (Kernel::VERSION_ID >= 50200) {
+            // profile does not need to be enabled in <5.2
+            $this->markTestSkipped();
+        }
+
+        self::bootKernel(['environment' => 'no_profiler']);
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->mailer()->assertSentEmailCount(1);
     }
 }

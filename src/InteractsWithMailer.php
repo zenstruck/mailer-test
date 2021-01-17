@@ -12,11 +12,11 @@ trait InteractsWithMailer
     final protected function mailer(): TestMailer
     {
         if (!$this instanceof KernelTestCase) {
-            throw new \RuntimeException('The %s trait can only be used with %s.', __TRAIT__, KernelTestCase::class);
+            throw new \LogicException(\sprintf('The %s trait can only be used with %s.', __TRAIT__, KernelTestCase::class));
         }
 
         if (!self::$container) {
-            throw new \RuntimeException('The kernel must be booted before accessing the mailer.');
+            throw new \LogicException('The kernel must be booted before accessing the mailer.');
         }
 
         if (self::$container->has('mailer.message_logger_listener')) {
@@ -27,6 +27,6 @@ trait InteractsWithMailer
             return new TestMailer(self::$container->get('mailer.logger_message_listener')->getEvents());
         }
 
-        throw new \RuntimeException('Mailer not enabled.');
+        throw new \LogicException('Mailer and/or profiling not enabled.');
     }
 }

@@ -6,6 +6,7 @@ use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
+use Zenstruck\Mailer\Test\Tests\Fixture\CustomTestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\Email1;
 use Zenstruck\Mailer\Test\Tests\Fixture\Kernel;
 
@@ -87,6 +88,24 @@ final class InteractsWithMailerTest extends KernelTestCase
         $this->expectExceptionMessage('Email sent, but "jim@example.com" is not among to-addresses: kevin@example.com');
 
         $this->mailer()->assertEmailSentTo('jim@example.com', 'subject');
+    }
+
+    /**
+     * @test
+     * @dataProvider environmentProvider
+     */
+    public function can_use_custom_test_email_class(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        $email = new Email1();
+        $email->getHeaders()->addTextHeader('X-PM-Tag', 'reset-password');
+
+        self::$container->get('mailer')->send($email);
+
+        $this->mailer()->assertEmailSentTo('kevin@example.com', function(CustomTestEmail $email) {
+            $email->assertHasPostmarkTag('reset-password');
+        });
     }
 
     public static function environmentProvider(): iterable

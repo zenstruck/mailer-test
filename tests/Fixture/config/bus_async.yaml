@@ -1,0 +1,9 @@
+imports:
+    - { resource: test.yaml }
+
+framework:
+    messenger:
+        transports:
+            async: in-memory://
+        routing:
+            Symfony\Component\Mailer\Messenger\SendEmailMessage: async

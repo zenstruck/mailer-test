@@ -3,6 +3,7 @@
 namespace Zenstruck\Mailer\Test;
 
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -81,6 +82,25 @@ final class TestMailer
      */
     public function rawSentEmails(): array
     {
-        return \array_filter($this->events->getMessages(), static fn(RawMessage $message) => $message instanceof Email);
+        $usingQueue = false;
+        $events = $this->events->getEvents();
+
+        foreach ($events as $event) {
+            if ($event->isQueued()) {
+                $usingQueue = true;
+
+                break;
+            }
+        }
+
+        if ($usingQueue) {
+            // if using queue, remove non queued messages to avoid duplicates
+            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
+        }
+
+        return \array_filter(
+            \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events),
+            static fn(RawMessage $message) => $message instanceof Email
+        );
     }
 }

@@ -24,11 +24,42 @@ final class TestMailer
     }
 
     /**
-     * @return TestEmail[]
+     * @return Email[]
      */
     public function sentEmails(): array
     {
-        return \array_map(static fn(Email $email) => new TestEmail($email), $this->rawSentEmails());
+        $usingQueue = false;
+        $events = $this->events->getEvents();
+
+        foreach ($events as $event) {
+            if ($event->isQueued()) {
+                $usingQueue = true;
+
+                break;
+            }
+        }
+
+        if ($usingQueue) {
+            // if using queue, remove non queued messages to avoid duplicates
+            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
+        }
+
+        return \array_filter(
+            \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events),
+            static fn(RawMessage $message) => $message instanceof Email
+        );
+    }
+
+    /**
+     * @return TestEmail[]
+     */
+    public function sentTestEmails(string $testEmailClass = TestEmail::class): array
+    {
+        if (!\is_a($testEmailClass, TestEmail::class, true)) {
+            throw new \InvalidArgumentException(\sprintf('$testEmailClass must be a class that\'s an instance of "%s".', TestEmail::class));
+        }
+
+        return \array_map(static fn(Email $email) => new $testEmailClass($email), $this->sentEmails());
     }
 
     public function assertNoEmailSent(): self
@@ -48,7 +79,7 @@ final class TestMailer
      */
     public function assertEmailSentTo(string $expectedTo, $callback): self
     {
-        $emails = $this->rawSentEmails();
+        $emails = $this->sentEmails();
 
         if (0 === \count($emails)) {
             Assert::fail('No emails have been sent.');
@@ -75,32 +106,5 @@ final class TestMailer
         }
 
         Assert::fail(\sprintf('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses))));
-    }
-
-    /**
-     * @return Email[]
-     */
-    public function rawSentEmails(): array
-    {
-        $usingQueue = false;
-        $events = $this->events->getEvents();
-
-        foreach ($events as $event) {
-            if ($event->isQueued()) {
-                $usingQueue = true;
-
-                break;
-            }
-        }
-
-        if ($usingQueue) {
-            // if using queue, remove non queued messages to avoid duplicates
-            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
-        }
-
-        return \array_filter(
-            \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events),
-            static fn(RawMessage $message) => $message instanceof Email
-        );
     }
 }

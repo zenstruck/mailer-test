@@ -108,11 +108,49 @@ final class InteractsWithMailerTest extends KernelTestCase
         });
     }
 
+    /**
+     * @test
+     * @dataProvider environmentProvider
+     */
+    public function can_access_sent_test_emails(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentTestEmails()[0]);
+    }
+
+    /**
+     * @test
+     * @dataProvider environmentProvider
+     */
+    public function can_access_sent_test_emails_with_custom_test_email_class(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentTestEmails(CustomTestEmail::class)[0]);
+    }
+
     public static function environmentProvider(): iterable
     {
         yield ['test'];
         yield ['bus_sync'];
         yield ['bus_async'];
+    }
+
+    /**
+     * @test
+     */
+    public function sent_test_email_argument_must_be_an_instance_of_test_email(): void
+    {
+        self::bootKernel();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->mailer()->sentTestEmails(\stdClass::class);
     }
 
     /**

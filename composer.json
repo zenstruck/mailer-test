@@ -21,7 +21,8 @@
         "phpunit/phpunit": "^9.5.0",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/phpunit-bridge": "^5.2",
-        "symfony/yaml": "^4.4|^5.0"
+        "symfony/yaml": "^4.4|^5.0",
+        "zenstruck/browser": "^1.0@dev"
     },
     "config": {
         "preferred-install": "dist",

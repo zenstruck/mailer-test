@@ -15,7 +15,7 @@ use Zenstruck\Mailer\Test\Tests\Fixture\Kernel;
  */
 final class InteractsWithMailerTest extends KernelTestCase
 {
-    use InteractsWithMailer;
+    use EnvironmentProvider, InteractsWithMailer;
 
     /**
      * @test
@@ -132,13 +132,6 @@ final class InteractsWithMailerTest extends KernelTestCase
         self::$container->get('mailer')->send(new Email1());
 
         $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentTestEmails(CustomTestEmail::class)[0]);
-    }
-
-    public static function environmentProvider(): iterable
-    {
-        yield ['test'];
-        yield ['bus_sync'];
-        yield ['bus_async'];
     }
 
     /**

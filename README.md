@@ -111,3 +111,85 @@ use InteractsWithMailer;
     }
 }
 ```
+
+### zenstruck/browser Integration
+
+This library provides a [zenstruck/browser](https://github.com/zenstruck/browser)
+"[Component](https://github.com/zenstruck/browser#custom-components)" and
+"[Extension](https://github.com/zenstruck/browser#custom-browser)". Since browser's
+make HTTP requests to your app, the messages are accessed via the profiler (using
+`symfony/mailer`'s data collector). Because of this, the `InteractsWithMailer` trait
+is not required in your test case. Since the profiler is required, this functionality
+is not available with `PantherBrowser`.
+
+#### MailerComponent
+
+The simplest way to get started testing emails with `zenstruck/browser` is to use the
+`MailerComponent`:
+
+```php
+use Zenstruck\Mailer\Test\Bridge\Zenstruck\Browser\MailerComponent;
+use Zenstruck\Mailer\Test\TestEmail;
+
+/** @var \Zenstruck\Browser\KernelBrowser $browser **/
+$browser
+    ->withProfiling() // enable the profiler for the next request
+    ->visit('/page/that/does/not/send/email')
+    ->use(function(MailerComponent $component) {
+        $component->assertNoEmailSent();
+    })
+    
+    ->withProfiling() // enable the profiler for the next request
+    ->visit('/page/that/sends/email')
+    ->use(function(MailerComponent $component) {
+        $component
+            ->assertSentEmailCount(1)
+            ->assertEmailSentTo('kevin@example.com', 'Email Subject')
+            ->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
+                // see Usage section above for full API
+            })
+        ;
+    })
+;
+```
+
+#### MailerExtension
+
+If many of your tests make email assertions the [MailerComponent](#mailercomponent)'s API
+can be a little verbose. Alternatively, you can add the methods directly on a
+[custom browser](https://github.com/zenstruck/browser#custom-browser) using the provided
+`MailerExtension` trait:
+
+```php
+namespace App\Tests;
+
+use Zenstruck\Browser\KernelBrowser;
+use Zenstruck\Mailer\Test\Bridge\Zenstruck\Browser\MailerExtension;
+
+class AppBrowser extends KernelBrowser
+{
+    use MailerExtension;
+}
+```
+
+Now, within your tests using this custom browser, the following email assertion
+API is available:
+
+```php
+use Zenstruck\Mailer\Test\TestEmail;
+
+/** @var \App\Tests\AppBrowser $browser **/
+$browser
+    ->withProfiling() // enable the profiler for the next request
+    ->visit('/page/that/does/not/send/email')
+    ->assertNoEmailSent()
+    
+    ->withProfiling() // enable the profiler for the next request
+    ->visit('/page/that/sends/email')
+    ->assertSentEmailCount(1)
+    ->assertEmailSentTo('kevin@example.com', 'Email Subject')
+    ->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
+        // see Usage section above for full API
+    })
+;
+```

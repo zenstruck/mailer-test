@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
@@ -15,6 +16,18 @@ use Symfony\Component\Routing\RouteCollectionBuilder;
 final class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
+
+    public function noEmail(): Response
+    {
+        return new Response();
+    }
+
+    public function sendEmail(): Response
+    {
+        $this->container->get('mailer')->send(new Email1());
+
+        return new Response();
+    }
 
     public function registerBundles(): iterable
     {
@@ -28,5 +41,7 @@ final class Kernel extends BaseKernel
 
     protected function configureRoutes(RouteCollectionBuilder $routes): void
     {
+        $routes->add('/no-email', 'kernel::noEmail');
+        $routes->add('/send-email', 'kernel::sendEmail');
     }
 }

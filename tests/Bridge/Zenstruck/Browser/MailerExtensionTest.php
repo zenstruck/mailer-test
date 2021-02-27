@@ -11,7 +11,7 @@ use Zenstruck\Mailer\Test\Tests\EnvironmentProvider;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  *
- * @method CustomBrowser kernelBrowser(array $options = [])
+ * @method CustomBrowser browser(array $options = [])
  */
 final class MailerExtensionTest extends KernelTestCase
 {
@@ -32,7 +32,7 @@ final class MailerExtensionTest extends KernelTestCase
     {
         $_SERVER['KERNEL_BROWSER_CLASS'] = CustomBrowser::class;
 
-        $this->kernelBrowser(['environment' => $environment])
+        $this->browser(['environment' => $environment])
             ->withProfiling()
             ->visit('/no-email')
             ->assertSuccessful()

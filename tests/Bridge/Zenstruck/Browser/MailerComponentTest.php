@@ -20,7 +20,7 @@ final class MailerComponentTest extends KernelTestCase
      */
     public function can_use_component(string $environment): void
     {
-        $this->kernelBrowser(['environment' => $environment])
+        $this->browser(['environment' => $environment])
             ->withProfiling()
             ->visit('/no-email')
             ->assertSuccessful()

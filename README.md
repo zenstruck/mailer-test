@@ -10,7 +10,7 @@ an alternative to the FrameworkBundle's `MailerAssertionsTrait`.
 ## Installation
 
 ```bash
-composer require --dev zenstruck/messenger-test
+composer require --dev zenstruck/mailer-test
 ```
 
 ## Usage

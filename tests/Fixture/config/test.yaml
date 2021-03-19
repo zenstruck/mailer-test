@@ -8,10 +8,6 @@ services:
         alias: Symfony\Component\Mailer\MailerInterface
         public: true
 
-    # disable logging
-    logger:
-        class: Psr\Log\NullLogger
-
 framework:
     secret: S3CRET
     router: { utf8: true }

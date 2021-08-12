@@ -2,12 +2,12 @@
 
 namespace Zenstruck\Mailer\Test;
 
-use PHPUnit\Framework\Assert;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
+use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 
@@ -69,7 +69,9 @@ final class TestMailer
 
     public function assertSentEmailCount(int $count): self
     {
-        Assert::assertCount($count, $this->sentEmails(), \sprintf('Expected %d emails to be sent, but %d emails were sent.', $count, \count($this->sentEmails())));
+        Assert::that($this->sentEmails())
+            ->hasCount($count, 'Expected {expected} emails to be sent, but {actual} emails were sent.')
+        ;
 
         return $this;
     }

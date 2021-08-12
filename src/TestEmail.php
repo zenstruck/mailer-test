@@ -2,8 +2,8 @@
 
 namespace Zenstruck\Mailer\Test;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\Mime\Email;
+use Zenstruck\Assert;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -26,7 +26,7 @@ class TestEmail
 
     final public function assertSubject(string $expected): self
     {
-        PHPUnit::assertSame($expected, $this->email->getSubject());
+        Assert::that($this->email->getSubject())->is($expected);
 
         return $this;
     }
@@ -38,13 +38,13 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedEmail, $address->getAddress());
-            PHPUnit::assertSame($expectedName, $address->getName());
+            Assert::that($address->getAddress())->is($expectedEmail);
+            Assert::that($address->getName())->is($expectedName);
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not have from [{$expectedEmail}]");
+        Assert::fail("Message does not have from [{$expectedEmail}]");
     }
 
     final public function assertTo(string $expectedEmail, string $expectedName = ''): self
@@ -54,13 +54,13 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedEmail, $address->getAddress());
-            PHPUnit::assertSame($expectedName, $address->getName());
+            Assert::that($address->getAddress())->is($expectedEmail);
+            Assert::that($address->getName())->is($expectedName);
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not have to [{$expectedEmail}]");
+        Assert::fail("Message does not have to [{$expectedEmail}]");
     }
 
     final public function assertCc(string $expectedEmail, string $expectedName = ''): self
@@ -70,13 +70,13 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedEmail, $address->getAddress());
-            PHPUnit::assertSame($expectedName, $address->getName());
+            Assert::that($address->getAddress())->is($expectedEmail);
+            Assert::that($address->getName())->is($expectedName);
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not have cc [{$expectedEmail}]");
+        Assert::fail("Message does not have cc [{$expectedEmail}]");
     }
 
     final public function assertBcc(string $expectedEmail, string $expectedName = ''): self
@@ -86,13 +86,13 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedEmail, $address->getAddress());
-            PHPUnit::assertSame($expectedName, $address->getName());
+            Assert::that($address->getAddress())->is($expectedEmail);
+            Assert::that($address->getName())->is($expectedName);
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not have bcc [{$expectedEmail}]");
+        Assert::fail("Message does not have bcc [{$expectedEmail}]");
     }
 
     final public function assertReplyTo(string $expectedEmail, string $expectedName = ''): self
@@ -102,13 +102,13 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedEmail, $address->getAddress());
-            PHPUnit::assertSame($expectedName, $address->getName());
+            Assert::that($address->getAddress())->is($expectedEmail);
+            Assert::that($address->getName())->is($expectedName);
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not have reply-to [{$expectedEmail}]");
+        Assert::fail("Message does not have reply-to [{$expectedEmail}]");
     }
 
     /**
@@ -124,14 +124,18 @@ class TestEmail
 
     final public function assertHtmlContains(string $expected): self
     {
-        PHPUnit::assertStringContainsString($expected, $this->email->getHtmlBody(), "The [text/html] part does not contain [{$expected}]");
+        Assert::that($this->email->getHtmlBody())
+            ->contains($expected, 'The [text/html] part does not contain "{expected}".')
+        ;
 
         return $this;
     }
 
     final public function assertTextContains(string $expected): self
     {
-        PHPUnit::assertStringContainsString($expected, $this->email->getTextBody(), "The [text/plain] part does not contain [{$expected}]");
+        Assert::that($this->email->getTextBody())
+            ->contains($expected, 'The [text/plain] part does not contain "{expected}".')
+        ;
 
         return $this;
     }
@@ -143,12 +147,14 @@ class TestEmail
                 continue;
             }
 
-            PHPUnit::assertSame($expectedContents, $attachment->getBody());
-            PHPUnit::assertSame($expectedContentType.'; name='.$expectedFilename, $attachment->getPreparedHeaders()->get('content-type')->getBodyAsString());
+            Assert::that($attachment->getBody())->is($expectedContents);
+            Assert::that($attachment->getPreparedHeaders()->get('content-type')->getBodyAsString())
+                ->is($expectedContentType.'; name='.$expectedFilename)
+            ;
 
             return $this;
         }
 
-        PHPUnit::fail("Message does not include file with filename [{$expectedFilename}]");
+        Assert::fail("Message does not include file with filename [{$expectedFilename}]");
     }
 }

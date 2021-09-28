@@ -33,5 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": { "Zenstruck\\Mailer\\Test\\Tests\\": "tests/" }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

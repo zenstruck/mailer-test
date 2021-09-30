@@ -1,8 +1,0 @@
-framework:
-    secret: S3CRET
-    router: { utf8: true }
-    test: true
-    profiler:
-        collect: false
-    messenger: false
-    mailer: false

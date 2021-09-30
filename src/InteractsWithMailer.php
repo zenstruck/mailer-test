@@ -9,6 +9,24 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 trait InteractsWithMailer
 {
+    /**
+     * @internal
+     * @before
+     */
+    final protected static function _startTestMailerCollection(): void
+    {
+        MessageEventCollector::start();
+    }
+
+    /**
+     * @internal
+     * @after
+     */
+    final protected static function _resetTestMailerCollection(): void
+    {
+        MessageEventCollector::reset();
+    }
+
     final protected function mailer(): TestMailer
     {
         if (!$this instanceof KernelTestCase) {
@@ -19,14 +37,10 @@ trait InteractsWithMailer
             throw new \LogicException('The kernel must be booted before accessing the mailer.');
         }
 
-        if (self::$container->has('mailer.message_logger_listener')) {
-            return new TestMailer(self::$container->get('mailer.message_logger_listener')->getEvents());
+        if (!self::$container->has('zenstruck_mailer_test.event_collector')) {
+            throw new \LogicException(\sprintf('Cannot access collected emails - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
         }
 
-        if (self::$container->has('mailer.logger_message_listener')) {
-            return new TestMailer(self::$container->get('mailer.logger_message_listener')->getEvents());
-        }
-
-        throw new \LogicException('Mailer and/or profiling not enabled.');
+        return self::$container->get('zenstruck_mailer_test.event_collector')->mailer();
     }
 }

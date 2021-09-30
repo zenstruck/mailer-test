@@ -9,9 +9,12 @@ an alternative to the FrameworkBundle's `MailerAssertionsTrait`.
 
 ## Installation
 
-```bash
-composer require --dev zenstruck/mailer-test
-```
+1. Install the library:
+    ```bash
+    composer require --dev zenstruck/mailer-test
+    ```
+2. If not added automatically by symfony/flex, enable `ZenstruckMailerTestBundle` in your
+   `test` environment
 
 ## Usage
 
@@ -62,11 +65,13 @@ class MyTest extends KernelTestCase // or WebTestCase
             // Any \Symfony\Component\Mime\Email methods can be used
             $this->assertSame('value', $email->getHeaders()->get('X-SOME-HEADER')->getBodyAsString());
         });
-        
+
         $this->mailer()->sentTestEmails(); // TestEmail[]
     }
 }
 ```
+
+**NOTE**: Emails are persisted between kernel reboots within each test.
 
 ### Custom TestEmail
 
@@ -143,7 +148,7 @@ $browser
     ->use(function(MailerComponent $component) {
         $component->assertNoEmailSent();
     })
-    
+
     ->withProfiling() // enable the profiler for the next request
     ->visit('/page/that/sends/email')
     ->use(function(MailerComponent $component) {
@@ -188,7 +193,7 @@ $browser
     ->withProfiling() // enable the profiler for the next request
     ->visit('/page/that/does/not/send/email')
     ->assertNoEmailSent()
-    
+
     ->withProfiling() // enable the profiler for the next request
     ->visit('/page/that/sends/email')
     ->assertSentEmailCount(1)

@@ -8,7 +8,7 @@ use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\CustomTestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\Email1;
-use Zenstruck\Mailer\Test\Tests\Fixture\Kernel;
+use Zenstruck\Mailer\Test\ZenstruckMailerTestBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -160,48 +160,46 @@ final class InteractsWithMailerTest extends KernelTestCase
     /**
      * @test
      */
-    public function mailer_must_be_enabled(): void
-    {
-        self::bootKernel(['environment' => 'no_mailer']);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Mailer and/or profiling not enabled');
-
-        $this->mailer();
-    }
-
-    /**
-     * @test
-     */
-    public function profiler_must_be_enabled_in_symfony_5_2(): void
-    {
-        if ('52' !== Kernel::MAJOR_VERSION.Kernel::MINOR_VERSION) {
-            // profile needs to be enabled in 5.2 only
-            $this->markTestSkipped();
-        }
-
-        self::bootKernel(['environment' => 'no_profiler']);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Mailer and/or profiling not enabled');
-
-        $this->mailer();
-    }
-
-    /**
-     * @test
-     */
     public function profiler_does_not_need_to_enabled(): void
     {
-        if ('52' === Kernel::MAJOR_VERSION.Kernel::MINOR_VERSION) {
-            // profile does not need to be enabled in versions other than 52
-            $this->markTestSkipped();
-        }
-
         self::bootKernel(['environment' => 'no_profiler']);
 
         self::$container->get('mailer')->send(new Email1());
 
         $this->mailer()->assertSentEmailCount(1);
+    }
+
+    /**
+     * @test
+     * @dataProvider environmentProvider
+     */
+    public function emails_are_persisted_between_reboots(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        $this->mailer()->assertNoEmailSent();
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->mailer()->assertSentEmailCount(1);
+
+        self::ensureKernelShutdown();
+
+        self::bootKernel(['environment' => $environment]);
+
+        $this->mailer()->assertSentEmailCount(1);
+    }
+
+    /**
+     * @test
+     */
+    public function bundle_must_be_enabled(): void
+    {
+        self::bootKernel(['environment' => 'no_bundle']);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot access collected emails - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
+
+        $this->mailer();
     }
 }

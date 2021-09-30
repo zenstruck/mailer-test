@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Mailer\Test\Tests\Fixture;
 
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -25,5 +27,14 @@ final class Email1 extends Email
             ->html('html body')
             ->text('text body')
         ;
+
+        if (\class_exists(TagHeader::class)) {
+            $this->getHeaders()
+                ->add(new TagHeader('foo'))
+                ->add(new TagHeader('bar'))
+                ->add(new MetadataHeader('color', 'blue'))
+                ->add(new MetadataHeader('id', '5'))
+            ;
+        }
     }
 }

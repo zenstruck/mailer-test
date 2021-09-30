@@ -173,10 +173,10 @@ final class InteractsWithMailerTest extends KernelTestCase
     /**
      * @test
      */
-    public function profiler_must_be_enabled_after_5_2(): void
+    public function profiler_must_be_enabled_in_symfony_5_2(): void
     {
-        if (Kernel::VERSION_ID < 50200) {
-            // profile needs to be enabled in 5.2+
+        if ('52' !== Kernel::MAJOR_VERSION.Kernel::MINOR_VERSION) {
+            // profile needs to be enabled in 5.2 only
             $this->markTestSkipped();
         }
 
@@ -191,10 +191,10 @@ final class InteractsWithMailerTest extends KernelTestCase
     /**
      * @test
      */
-    public function profiler_does_not_need_to_enabled_prior_to_5_2(): void
+    public function profiler_does_not_need_to_enabled(): void
     {
-        if (Kernel::VERSION_ID >= 50200) {
-            // profile does not need to be enabled in <5.2
+        if ('52' === Kernel::MAJOR_VERSION.Kernel::MINOR_VERSION) {
+            // profile does not need to be enabled in versions other than 52
             $this->markTestSkipped();
         }
 

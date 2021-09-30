@@ -52,6 +52,11 @@ class MyTest extends KernelTestCase // or WebTestCase
                 ->assertHtmlContains('some text')
                 ->assertContains('some text') // asserts text and html both contain a value
                 ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
+
+                // tag/meta data assertions (https://symfony.com/doc/current/mailer.html#adding-tags-and-metadata-to-emails)
+                ->assertHasTag('password-reset')
+                ->assertHasMetadata('Color')
+                ->assertHasMetadata('Color', 'blue')
             ;
 
             // Any \Symfony\Component\Mime\Email methods can be used

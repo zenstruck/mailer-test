@@ -2,6 +2,8 @@
 
 namespace Zenstruck\Mailer\Test;
 
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 use Zenstruck\Assert;
 
@@ -22,6 +24,54 @@ class TestEmail
     final public function __call($name, $arguments)
     {
         return $this->email->{$name}(...$arguments);
+    }
+
+    /**
+     * @return string|null The first {@see TagHeader} value found or null if none
+     */
+    final public function tag(): ?string
+    {
+        return $this->tags()[0] ?? null;
+    }
+
+    /**
+     * @return string[] The {@see TagHeader} values
+     */
+    final public function tags(): array
+    {
+        if (!\class_exists(TagHeader::class)) {
+            throw new \BadMethodCallException('Tags can only be used in symfony/mailer 5.1+.');
+        }
+
+        $tags = [];
+
+        foreach ($this->getHeaders()->all() as $header) {
+            if ($header instanceof TagHeader) {
+                $tags[] = $header->getValue();
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     * @return array<string, string> The {@see MetadataHeader} keys/values
+     */
+    final public function metadata(): array
+    {
+        if (!\class_exists(MetadataHeader::class)) {
+            throw new \BadMethodCallException('Metadata can only be used in symfony/mailer 5.1+.');
+        }
+
+        $metadata = [];
+
+        foreach ($this->getHeaders()->all() as $header) {
+            if ($header instanceof MetadataHeader) {
+                $metadata[$header->getKey()] = $header->getValue();
+            }
+        }
+
+        return $metadata;
     }
 
     final public function assertSubject(string $expected): self
@@ -156,5 +206,29 @@ class TestEmail
         }
 
         Assert::fail("Message does not include file with filename [{$expectedFilename}]");
+    }
+
+    final public function assertHasTag(string $expected): self
+    {
+        Assert::that($this->tags())
+            ->isNotEmpty('No tags found.')
+            ->contains($expected, 'Expected to have tag "{needle}".')
+        ;
+
+        return $this;
+    }
+
+    final public function assertHasMetadata(string $expectedKey, ?string $expectedValue = null): self
+    {
+        Assert::that($metadata = $this->metadata())->isNotEmpty('No metadata found.');
+        Assert::that(\array_keys($metadata))->contains($expectedKey, 'Expected to have metadata key "{needle}".');
+
+        if (null !== $expectedValue) {
+            Assert::that($metadata[$expectedKey])->is($expectedValue, 'Expected metadata "{key}" to be "{expected}".', [
+                'key' => $expectedKey,
+            ]);
+        }
+
+        return $this;
     }
 }

@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
+use Zenstruck\Mailer\Test\ZenstruckMailerTestBundle;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -32,6 +33,10 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+
+        if ('no_bundle' !== $this->environment) {
+            yield new ZenstruckMailerTestBundle();
+        }
     }
 
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void

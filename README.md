@@ -63,11 +63,15 @@ class MyTest extends KernelTestCase // or WebTestCase
             // Any \Symfony\Component\Mime\Email methods can be used
             $this->assertSame('value', $email->getHeaders()->get('X-SOME-HEADER')->getBodyAsString());
         });
+
+        // reset collected emails
+        $this->mailer()->reset();
     }
 }
 ```
 
-**NOTE**: Emails are persisted between kernel reboots within each test.
+**NOTE**: Emails are persisted between kernel reboots within each test. You can reset the
+collected emails with `$this->mailer()->reset()`.
 
 ### Custom TestEmail
 

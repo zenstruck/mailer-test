@@ -43,9 +43,7 @@ final class TestMailer
 
     public function sentEmails(): SentEmails
     {
-        if (!self::$events) {
-            throw new \LogicException('Cannot access sent emails as email collection has not yet been started.');
-        }
+        self::ensureStarted();
 
         return SentEmails::fromEvents(self::$events);
     }
@@ -62,5 +60,23 @@ final class TestMailer
         }
 
         return \array_map(static fn(Email $email) => new $testEmailClass($email), $this->sentEmails()->all());
+    }
+
+    /**
+     * Reset the collected emails.
+     */
+    public function reset(): self
+    {
+        self::ensureStarted();
+        self::start();
+
+        return $this;
+    }
+
+    private static function ensureStarted(): void
+    {
+        if (!self::$events) {
+            throw new \LogicException('Cannot access sent emails as email collection has not yet been started.');
+        }
     }
 }

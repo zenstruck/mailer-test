@@ -4,50 +4,50 @@ namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\RawMessage;
-use Zenstruck\Assert;
-use Zenstruck\Callback;
-use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class TestMailer
 {
-    private MessageEvents $events;
+    use SentEmailMixin;
 
-    public function __construct(MessageEvents $events)
+    private static ?MessageEvents $events = null;
+
+    /**
+     * @internal
+     */
+    public static function start(): void
     {
-        $this->events = $events;
+        self::$events = new MessageEvents();
     }
 
     /**
-     * @return Email[]
+     * @internal
      */
-    public function sentEmails(): array
+    public static function stop(): void
     {
-        $usingQueue = false;
-        $events = $this->events->getEvents();
+        self::$events = null;
+    }
 
-        foreach ($events as $event) {
-            if ($event->isQueued()) {
-                $usingQueue = true;
+    /**
+     * @internal
+     */
+    public static function add(MessageEvent $event): void
+    {
+        if (self::$events) {
+            self::$events->add($event);
+        }
+    }
 
-                break;
-            }
+    public function sentEmails(): SentEmails
+    {
+        if (!self::$events) {
+            throw new \LogicException('Cannot access sent emails as email collection has not yet been started.');
         }
 
-        if ($usingQueue) {
-            // if using queue, remove non queued messages to avoid duplicates
-            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
-        }
-
-        return \array_filter(
-            \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events),
-            static fn(RawMessage $message) => $message instanceof Email
-        );
+        return SentEmails::fromEvents(self::$events);
     }
 
     /**
@@ -55,58 +55,12 @@ final class TestMailer
      */
     public function sentTestEmails(string $testEmailClass = TestEmail::class): array
     {
+        // todo deprecate/remove
+
         if (!\is_a($testEmailClass, TestEmail::class, true)) {
             throw new \InvalidArgumentException(\sprintf('$testEmailClass must be a class that\'s an instance of "%s".', TestEmail::class));
         }
 
-        return \array_map(static fn(Email $email) => new $testEmailClass($email), $this->sentEmails());
-    }
-
-    public function assertNoEmailSent(): self
-    {
-        return $this->assertSentEmailCount(0);
-    }
-
-    public function assertSentEmailCount(int $count): self
-    {
-        Assert::that($this->sentEmails())
-            ->hasCount($count, 'Expected {expected} emails to be sent, but {actual} emails were sent.')
-        ;
-
-        return $this;
-    }
-
-    /**
-     * @param callable|string $callback Takes an instance of the found Email as TestEmail - if string, assume subject
-     */
-    public function assertEmailSentTo(string $expectedTo, $callback): self
-    {
-        $emails = $this->sentEmails();
-
-        if (0 === \count($emails)) {
-            Assert::fail('No emails have been sent.');
-        }
-
-        if (!\is_callable($callback)) {
-            $callback = static fn(TestEmail $message) => $message->assertSubject($callback);
-        }
-
-        $foundToAddresses = [];
-
-        foreach ($emails as $email) {
-            $toAddresses = \array_map(static fn(Address $address) => $address->getAddress(), $email->getTo());
-            $foundToAddresses[] = $toAddresses;
-
-            if (\in_array($expectedTo, $toAddresses, true)) {
-                // address matches
-                Callback::createFor($callback)->invoke(
-                    Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => new $class($email)))
-                );
-
-                return $this;
-            }
-        }
-
-        Assert::fail(\sprintf('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses))));
+        return \array_map(static fn(Email $email) => new $testEmailClass($email), $this->sentEmails()->all());
     }
 }

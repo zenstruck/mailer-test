@@ -34,8 +34,6 @@ class MyTest extends KernelTestCase // or WebTestCase
     {
         // ...some code that sends emails...
 
-        $this->mailer()->sentEmails(); // \Symfony\Component\Mime\Email[]
-
         $this->mailer()->assertNoEmailSent();
         $this->mailer()->assertSentEmailCount(5);
         $this->mailer()->assertEmailSentTo('kevin@example.com', 'the subject');
@@ -65,8 +63,6 @@ class MyTest extends KernelTestCase // or WebTestCase
             // Any \Symfony\Component\Mime\Email methods can be used
             $this->assertSame('value', $email->getHeaders()->get('X-SOME-HEADER')->getBodyAsString());
         });
-
-        $this->mailer()->sentTestEmails(); // TestEmail[]
     }
 }
 ```

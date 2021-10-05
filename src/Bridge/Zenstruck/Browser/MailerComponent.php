@@ -4,44 +4,17 @@ namespace Zenstruck\Mailer\Test\Bridge\Zenstruck\Browser;
 
 use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
-use Zenstruck\Mailer\Test\TestMailer;
+use Zenstruck\Mailer\Test\SentEmailMixin;
+use Zenstruck\Mailer\Test\SentEmails;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
 final class MailerComponent extends Component
 {
-    /**
-     * @see TestMailer::assertNoEmailSent()
-     */
-    public function assertNoEmailSent(): self
-    {
-        $this->testMailer()->assertNoEmailSent();
+    use SentEmailMixin;
 
-        return $this;
-    }
-
-    /**
-     * @see TestMailer::assertSentEmailCount()
-     */
-    public function assertSentEmailCount(int $count): self
-    {
-        $this->testMailer()->assertSentEmailCount($count);
-
-        return $this;
-    }
-
-    /**
-     * @see TestMailer::assertEmailSentTo()
-     */
-    public function assertEmailSentTo(string $expectedTo, $callback): self
-    {
-        $this->testMailer()->assertEmailSentTo($expectedTo, $callback);
-
-        return $this;
-    }
-
-    private function testMailer(): TestMailer
+    public function sentEmails(): SentEmails
     {
         $browser = $this->browser();
 
@@ -53,6 +26,6 @@ final class MailerComponent extends Component
             throw new \RuntimeException('The profiler does not include the "mailer" collector. Is symfony/mailer installed?');
         }
 
-        return new TestMailer($browser->profile()->getCollector('mailer')->getEvents());
+        return SentEmails::fromEvents($browser->profile()->getCollector('mailer')->getEvents());
     }
 }

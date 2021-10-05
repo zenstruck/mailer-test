@@ -34,8 +34,6 @@ class MyTest extends KernelTestCase // or WebTestCase
     {
         // ...some code that sends emails...
 
-        $this->mailer()->sentEmails(); // \Symfony\Component\Mime\Email[]
-
         $this->mailer()->assertNoEmailSent();
         $this->mailer()->assertSentEmailCount(5);
         $this->mailer()->assertEmailSentTo('kevin@example.com', 'the subject');
@@ -66,12 +64,14 @@ class MyTest extends KernelTestCase // or WebTestCase
             $this->assertSame('value', $email->getHeaders()->get('X-SOME-HEADER')->getBodyAsString());
         });
 
-        $this->mailer()->sentTestEmails(); // TestEmail[]
+        // reset collected emails
+        $this->mailer()->reset();
     }
 }
 ```
 
-**NOTE**: Emails are persisted between kernel reboots within each test.
+**NOTE**: Emails are persisted between kernel reboots within each test. You can reset the
+collected emails with `$this->mailer()->reset()`.
 
 ### Custom TestEmail
 

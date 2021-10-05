@@ -13,18 +13,18 @@ trait InteractsWithMailer
      * @internal
      * @before
      */
-    final protected static function _startTestMailerCollection(): void
+    final protected static function _startTestMailer(): void
     {
-        MessageEventCollector::start();
+        TestMailer::start();
     }
 
     /**
      * @internal
      * @after
      */
-    final protected static function _resetTestMailerCollection(): void
+    final protected static function _stopTestMailer(): void
     {
-        MessageEventCollector::reset();
+        TestMailer::stop();
     }
 
     final protected function mailer(): TestMailer
@@ -37,10 +37,10 @@ trait InteractsWithMailer
             throw new \LogicException('The kernel must be booted before accessing the mailer.');
         }
 
-        if (!self::$container->has('zenstruck_mailer_test.event_collector')) {
-            throw new \LogicException(\sprintf('Cannot access collected emails - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
+        if (!self::$container->has('zenstruck_mailer_test.mailer')) {
+            throw new \LogicException(\sprintf('Cannot access test mailer - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
         }
 
-        return self::$container->get('zenstruck_mailer_test.event_collector')->mailer();
+        return self::$container->get('zenstruck_mailer_test.mailer');
     }
 }

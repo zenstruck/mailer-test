@@ -192,13 +192,40 @@ final class InteractsWithMailerTest extends KernelTestCase
 
     /**
      * @test
+     * @dataProvider environmentProvider
+     */
+    public function can_reset_collected_emails(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        $this->mailer()->assertNoEmailSent();
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->mailer()
+            ->assertSentEmailCount(1)
+            ->reset()
+            ->assertNoEmailSent()
+        ;
+
+        self::ensureKernelShutdown();
+
+        self::bootKernel(['environment' => $environment]);
+
+        self::$container->get('mailer')->send(new Email1());
+
+        $this->mailer()->assertSentEmailCount(1);
+    }
+
+    /**
+     * @test
      */
     public function bundle_must_be_enabled(): void
     {
         self::bootKernel(['environment' => 'no_bundle']);
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(\sprintf('Cannot access collected emails - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
+        $this->expectExceptionMessage(\sprintf('Cannot access test mailer - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
 
         $this->mailer();
     }

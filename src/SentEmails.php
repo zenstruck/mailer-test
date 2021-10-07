@@ -70,6 +70,15 @@ final class SentEmails implements \IteratorAggregate, \Countable
         return $this->assertCount(0);
     }
 
+    public function ensureSome(): self
+    {
+        if (0 === \count($this->emails)) {
+            Assert::fail('No emails have been sent.');
+        }
+
+        return $this;
+    }
+
     /**
      * @return \Traversable|Email[]
      */

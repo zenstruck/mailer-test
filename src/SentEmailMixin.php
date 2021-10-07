@@ -3,6 +3,7 @@
 namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
@@ -39,27 +40,23 @@ trait SentEmailMixin
      */
     public function assertEmailSentTo(string $expectedTo, $callback): self
     {
-        $emails = $this->sentEmails();
-
-        if (0 === \count($emails)) {
-            Assert::fail('No emails have been sent.');
-        }
-
         if (!\is_callable($callback)) {
             $callback = static fn(TestEmail $message) => $message->assertSubject($callback);
         }
 
         $foundToAddresses = [];
 
-        foreach ($emails as $email) {
+        foreach ($this->sentEmails()->ensureSome() as $email) {
             $toAddresses = \array_map(static fn(Address $address) => $address->getAddress(), $email->getTo());
             $foundToAddresses[] = $toAddresses;
 
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
-                Callback::createFor($callback)->invoke(
+                Callback::createFor($callback)->invoke(Parameter::union(
+                    Parameter::untyped(Parameter::factory(fn() => new TestEmail($email))),
+                    Parameter::typed(Email::class, $email),
                     Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => new $class($email)))
-                );
+                ));
 
                 return $this;
             }

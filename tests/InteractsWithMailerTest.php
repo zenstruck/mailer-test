@@ -4,6 +4,7 @@ namespace Zenstruck\Mailer\Test\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Mime\Email;
 use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\CustomTestEmail;
@@ -69,6 +70,15 @@ final class InteractsWithMailerTest extends KernelTestCase
                 ;
 
                 // TestEmail can call underlying Symfony\Component\Mime\Email methods
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+            ->assertEmailSentTo('kevin@example.com', function(Email $email) {
+                // can type-hint raw email
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+            ->assertEmailSentTo('kevin@example.com', function($email) {
+                // no typehint uses TestEmail
+                $this->assertInstanceOf(TestEmail::class, $email);
                 $this->assertSame('Kevin', $email->getTo()[0]->getName());
             })
         ;

@@ -128,7 +128,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::$container->get('mailer')->send(new Email1());
 
-        $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentTestEmails()[0]);
+        $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentEmails()->all()[0]);
     }
 
     /**
@@ -141,7 +141,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::$container->get('mailer')->send(new Email1());
 
-        $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentTestEmails(CustomTestEmail::class)[0]);
+        $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentEmails()->all(CustomTestEmail::class)[0]);
     }
 
     /**

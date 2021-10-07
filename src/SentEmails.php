@@ -13,10 +13,10 @@ use Zenstruck\Assert;
  */
 final class SentEmails implements \IteratorAggregate, \Countable
 {
-    /** @var Email[] */
+    /** @var TestEmail[] */
     private array $emails;
 
-    public function __construct(Email ...$emails)
+    public function __construct(TestEmail ...$emails)
     {
         $this->emails = $emails;
     }
@@ -45,15 +45,30 @@ final class SentEmails implements \IteratorAggregate, \Countable
         // remove non Email messages
         $messages = \array_filter($messages, static fn(RawMessage $message) => $message instanceof Email);
 
+        // convert to TestEmails
+        $messages = \array_map(static fn(Email $email) => new TestEmail($email), $messages);
+
         return new self(...$messages);
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string $class
+     *
+     * @return TestEmail[]|T[]
+     */
+    public function all(string $class = TestEmail::class): array
+    {
+        return \array_map(static fn(TestEmail $email) => $email->as($class), $this->emails);
     }
 
     /**
      * @return Email[]
      */
-    public function all(): array
+    public function raw(): array
     {
-        return $this->emails;
+        return \array_map(static fn(TestEmail $email) => $email->inner(), $this->emails);
     }
 
     public function assertCount(int $expected): self
@@ -80,7 +95,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \Traversable|Email[]
+     * @return \Traversable|TestEmail[]
      */
     public function getIterator(): \Traversable
     {

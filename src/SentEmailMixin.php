@@ -53,9 +53,9 @@ trait SentEmailMixin
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
                 Callback::createFor($callback)->invoke(Parameter::union(
-                    Parameter::untyped(Parameter::factory(fn() => new TestEmail($email))),
-                    Parameter::typed(Email::class, $email),
-                    Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => new $class($email)))
+                    Parameter::untyped($email),
+                    Parameter::typed(Email::class, $email->inner()),
+                    Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => $email->as($class)))
                 ));
 
                 return $this;

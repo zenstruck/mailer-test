@@ -27,6 +27,31 @@ class TestEmail
     }
 
     /**
+     * @template T
+     *
+     * @param class-string $class
+     *
+     * @return T
+     */
+    final public function as(string $class): self
+    {
+        if (self::class === $class) {
+            return $this;
+        }
+
+        if (!\is_a($class, self::class, true)) {
+            throw new \InvalidArgumentException(\sprintf('$class must be a class that\'s an instance of "%s".', self::class));
+        }
+
+        return new $class($this->inner());
+    }
+
+    final public function inner(): Email
+    {
+        return $this->email;
+    }
+
+    /**
      * @return string|null The first {@see TagHeader} value found or null if none
      */
     final public function tag(): ?string

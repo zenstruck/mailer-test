@@ -4,7 +4,6 @@ namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
-use Symfony\Component\Mime\Email;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -46,20 +45,6 @@ final class TestMailer
         self::ensureStarted();
 
         return SentEmails::fromEvents(self::$events);
-    }
-
-    /**
-     * @return TestEmail[]
-     */
-    public function sentTestEmails(string $testEmailClass = TestEmail::class): array
-    {
-        // todo deprecate/remove
-
-        if (!\is_a($testEmailClass, TestEmail::class, true)) {
-            throw new \InvalidArgumentException(\sprintf('$testEmailClass must be a class that\'s an instance of "%s".', TestEmail::class));
-        }
-
-        return \array_map(static fn(Email $email) => new $testEmailClass($email), $this->sentEmails()->all());
     }
 
     /**

@@ -151,9 +151,11 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel();
 
+        self::$container->get('mailer')->send(new Email1());
+
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->mailer()->sentTestEmails(\stdClass::class);
+        $this->mailer()->sentEmails()->all(\stdClass::class);
     }
 
     /**

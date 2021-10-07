@@ -52,6 +52,89 @@ final class SentEmails implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Get the first email in the collection - fail if none.
+     *
+     * @template T
+     *
+     * @param class-string $class
+     *
+     * @return T
+     */
+    public function first(string $class = TestEmail::class): self
+    {
+        return $this->ensureSome()->all($class)[\array_key_first($this->emails)];
+    }
+
+    /**
+     * Get the last email in the collection - fail if none.
+     *
+     * @template T
+     *
+     * @param class-string $class
+     *
+     * @return T
+     */
+    public function last(string $class = TestEmail::class): self
+    {
+        return $this->ensureSome()->all($class)[\array_key_last($this->emails)];
+    }
+
+    /**
+     * Perform callback on each email.
+     *
+     * @param callable(TestEmail|Email):void $callback {@see TestEmail::call()}
+     */
+    public function each(callable $callback): self
+    {
+        foreach ($this as $email) {
+            $email->call($callback);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Filter collection.
+     *
+     * @param callable(TestEmail|Email):bool $filter {@see TestEmail::call()}
+     */
+    public function where(callable $filter): self
+    {
+        return new self(...\array_filter($this->emails, $filter));
+    }
+
+    public function whereSubject(string $subject): self
+    {
+        return $this->where(fn(Email $email) => $email->getSubject() === $subject);
+    }
+
+    public function whereSubjectContains(string $needle): self
+    {
+        return $this->where(fn(Email $email) => str_contains($email->getSubject(), $needle));
+    }
+
+    public function whereTag(string $tag): self
+    {
+        return $this->where(fn(TestEmail $email) => $email->tag() === $tag);
+    }
+
+    public function dump(): self
+    {
+        \call_user_func(\function_exists('dump') ? 'dump' : 'var_dump', $this->raw());
+
+        return $this;
+    }
+
+    /**
+     * @return never-return
+     */
+    public function dd(): void
+    {
+        $this->dump();
+        exit(1);
+    }
+
+    /**
      * @template T
      *
      * @param class-string $class

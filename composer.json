@@ -15,6 +15,7 @@
         "php": ">=7.4",
         "symfony/framework-bundle": "^4.4|^5.0",
         "symfony/mailer": "^4.4|^5.0",
+        "symfony/polyfill-php80": "^1.23.1",
         "zenstruck/assert": "^1.0",
         "zenstruck/callback": "^1.1"
     },
@@ -22,6 +23,7 @@
         "phpunit/phpunit": "^9.5.0",
         "symfony/messenger": "^4.4|^5.0",
         "symfony/phpunit-bridge": "^5.2",
+        "symfony/var-dumper": "^4.4|^5.0",
         "symfony/yaml": "^4.4|^5.0",
         "zenstruck/browser": "^1.0@dev"
     },

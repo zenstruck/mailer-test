@@ -6,6 +6,8 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Email;
 use Zenstruck\Assert;
+use Zenstruck\Callback;
+use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -44,6 +46,20 @@ class TestEmail
         }
 
         return new $class($this->inner());
+    }
+
+    /**
+     * @param callable(TestEmail|Email):mixed $callback
+     *
+     * @return mixed
+     */
+    final public function call(callable $callback)
+    {
+        return Callback::createFor($callback)->invoke(Parameter::union(
+            Parameter::untyped($this),
+            Parameter::typed(Email::class, $this->inner()),
+            Parameter::typed(self::class, Parameter::factory(fn(string $class) => $this->as($class)))
+        ));
     }
 
     final public function inner(): Email

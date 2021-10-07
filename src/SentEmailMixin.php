@@ -3,10 +3,7 @@
 namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Zenstruck\Assert;
-use Zenstruck\Callback;
-use Zenstruck\Callback\Parameter;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,7 +31,8 @@ trait SentEmailMixin
     }
 
     /**
-     * @param callable|string $callback Takes an instance of the found Email as TestEmail - if string, assume subject
+     * @param callable|string $callback callable: {@see TestEmail::call()}
+     *                                  string: subject
      *
      * @return static
      */
@@ -52,11 +50,7 @@ trait SentEmailMixin
 
             if (\in_array($expectedTo, $toAddresses, true)) {
                 // address matches
-                Callback::createFor($callback)->invoke(Parameter::union(
-                    Parameter::untyped($email),
-                    Parameter::typed(Email::class, $email->inner()),
-                    Parameter::typed(TestEmail::class, Parameter::factory(fn(string $class) => $email->as($class)))
-                ));
+                $email->call($callback);
 
                 return $this;
             }

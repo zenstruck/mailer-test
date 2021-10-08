@@ -63,6 +63,7 @@ final class InteractsWithMailerTest extends KernelTestCase
                     ->assertCc('cc@example.com')
                     ->assertBcc('bcc@example.com')
                     ->assertReplyTo('reply@example.com')
+                    ->assertSubjectContains('sub')
                     ->assertHtmlContains('html body')
                     ->assertTextContains('text body')
                     ->assertContains('body')

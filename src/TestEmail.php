@@ -122,6 +122,13 @@ class TestEmail
         return $this;
     }
 
+    final public function assertSubjectContains(string $needle): self
+    {
+        Assert::that($this->email->getSubject())->contains($needle);
+
+        return $this;
+    }
+
     final public function assertFrom(string $expectedEmail, string $expectedName = ''): self
     {
         foreach ($this->email->getFrom() as $address) {

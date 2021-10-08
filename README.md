@@ -44,6 +44,7 @@ class MyTest extends KernelTestCase // or WebTestCase
         $this->mailer()->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
             $email
                 ->assertSubject('Email Subject')
+                ->assertSubjectContains('Subject')
                 ->assertFrom('from@example.com')
                 ->assertReplyTo('reply@example.com')
                 ->assertCc('cc1@example.com')

@@ -12,7 +12,7 @@ trait MailerExtension
 {
     use SentEmailMixin;
 
-    public function sentEmails(): SentEmails
+    private function sentEmails(): SentEmails
     {
         return (new MailerComponent($this))->sentEmails();
     }

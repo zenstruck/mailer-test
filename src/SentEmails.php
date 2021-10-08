@@ -4,6 +4,7 @@ namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 use Zenstruck\Assert;
@@ -60,7 +61,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
      *
      * @return T
      */
-    public function first(string $class = TestEmail::class): self
+    public function first(string $class = TestEmail::class): TestEmail
     {
         return $this->ensureSome()->all($class)[\array_key_first($this->emails)];
     }
@@ -74,7 +75,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
      *
      * @return T
      */
-    public function last(string $class = TestEmail::class): self
+    public function last(string $class = TestEmail::class): TestEmail
     {
         return $this->ensureSome()->all($class)[\array_key_last($this->emails)];
     }
@@ -116,6 +117,31 @@ final class SentEmails implements \IteratorAggregate, \Countable
     public function whereTag(string $tag): self
     {
         return $this->where(fn(TestEmail $email) => $email->tag() === $tag);
+    }
+
+    public function whereFrom(string $email): self
+    {
+        return $this->where(fn(Email $message) => self::emailsContain($message->getFrom(), $email));
+    }
+
+    public function whereTo(string $email): self
+    {
+        return $this->where(fn(Email $message) => self::emailsContain($message->getTo(), $email));
+    }
+
+    public function whereCc(string $email): self
+    {
+        return $this->where(fn(Email $message) => self::emailsContain($message->getCc(), $email));
+    }
+
+    public function whereBcc(string $email): self
+    {
+        return $this->where(fn(Email $message) => self::emailsContain($message->getBcc(), $email));
+    }
+
+    public function whereReplyTo(string $email): self
+    {
+        return $this->where(fn(Email $message) => self::emailsContain($message->getReplyTo(), $email));
     }
 
     public function dump(): self
@@ -168,10 +194,10 @@ final class SentEmails implements \IteratorAggregate, \Countable
         return $this->assertCount(0);
     }
 
-    public function ensureSome(): self
+    public function ensureSome(string $message = 'No emails.', array $context = []): self
     {
         if (0 === \count($this->emails)) {
-            Assert::fail('No emails have been sent.');
+            Assert::fail($message, $context);
         }
 
         return $this;
@@ -188,5 +214,19 @@ final class SentEmails implements \IteratorAggregate, \Countable
     public function count(): int
     {
         return \count($this->emails);
+    }
+
+    /**
+     * @param Address[] $addresses
+     */
+    private static function emailsContain(array $addresses, string $needle): bool
+    {
+        foreach ($addresses as $address) {
+            if ($address->getAddress() === $needle) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

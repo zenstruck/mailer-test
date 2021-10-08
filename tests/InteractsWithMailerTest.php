@@ -96,7 +96,7 @@ final class InteractsWithMailerTest extends KernelTestCase
         self::$container->get('mailer')->send(new Email1());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Email sent, but "jim@example.com" is not among to-addresses: kevin@example.com');
+        $this->expectExceptionMessage('No email was sent to "jim@example.com".');
 
         $this->mailer()->assertEmailSentTo('jim@example.com', 'subject');
     }

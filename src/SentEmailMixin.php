@@ -2,9 +2,6 @@
 
 namespace Zenstruck\Mailer\Test;
 
-use Symfony\Component\Mime\Address;
-use Zenstruck\Assert;
-
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
@@ -42,21 +39,15 @@ trait SentEmailMixin
             $callback = static fn(TestEmail $message) => $message->assertSubject($callback);
         }
 
-        $foundToAddresses = [];
+        $this->sentEmails()
+            ->ensureSome('No emails have been sent.')
+            ->whereTo($expectedTo)
+            ->ensureSome('No email was sent to "{expected}".', ['expected' => $expectedTo])
+            ->first()
+            ->call($callback)
+        ;
 
-        foreach ($this->sentEmails()->ensureSome() as $email) {
-            $toAddresses = \array_map(static fn(Address $address) => $address->getAddress(), $email->getTo());
-            $foundToAddresses[] = $toAddresses;
-
-            if (\in_array($expectedTo, $toAddresses, true)) {
-                // address matches
-                $email->call($callback);
-
-                return $this;
-            }
-        }
-
-        Assert::fail(\sprintf('Email sent, but "%s" is not among to-addresses: %s', $expectedTo, \implode(', ', \array_merge(...$foundToAddresses))));
+        return $this;
     }
 
     abstract public function sentEmails(): SentEmails;

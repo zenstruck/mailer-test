@@ -4,6 +4,7 @@ namespace Zenstruck\Mailer\Test\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Mime\Email;
 use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
 use Zenstruck\Mailer\Test\Tests\Fixture\CustomTestEmail;
@@ -62,6 +63,7 @@ final class InteractsWithMailerTest extends KernelTestCase
                     ->assertCc('cc@example.com')
                     ->assertBcc('bcc@example.com')
                     ->assertReplyTo('reply@example.com')
+                    ->assertSubjectContains('sub')
                     ->assertHtmlContains('html body')
                     ->assertTextContains('text body')
                     ->assertContains('body')
@@ -69,6 +71,15 @@ final class InteractsWithMailerTest extends KernelTestCase
                 ;
 
                 // TestEmail can call underlying Symfony\Component\Mime\Email methods
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+            ->assertEmailSentTo('kevin@example.com', function(Email $email) {
+                // can type-hint raw email
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+            ->assertEmailSentTo('kevin@example.com', function($email) {
+                // no typehint uses TestEmail
+                $this->assertInstanceOf(TestEmail::class, $email);
                 $this->assertSame('Kevin', $email->getTo()[0]->getName());
             })
         ;
@@ -85,7 +96,7 @@ final class InteractsWithMailerTest extends KernelTestCase
         self::$container->get('mailer')->send(new Email1());
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Email sent, but "jim@example.com" is not among to-addresses: kevin@example.com');
+        $this->expectExceptionMessage('No email was sent to "jim@example.com".');
 
         $this->mailer()->assertEmailSentTo('jim@example.com', 'subject');
     }
@@ -118,7 +129,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::$container->get('mailer')->send(new Email1());
 
-        $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentTestEmails()[0]);
+        $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentEmails()->all()[0]);
     }
 
     /**
@@ -131,7 +142,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::$container->get('mailer')->send(new Email1());
 
-        $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentTestEmails(CustomTestEmail::class)[0]);
+        $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentEmails()->all(CustomTestEmail::class)[0]);
     }
 
     /**
@@ -141,9 +152,11 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel();
 
+        self::$container->get('mailer')->send(new Email1());
+
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->mailer()->sentTestEmails(\stdClass::class);
+        $this->mailer()->sentEmails()->all(\stdClass::class);
     }
 
     /**

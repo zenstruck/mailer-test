@@ -4,13 +4,16 @@ namespace Zenstruck\Mailer\Test;
 
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Zenstruck\Assert;
+use Zenstruck\Callback;
+use Zenstruck\Callback\Parameter;
 
 /**
- * @author Kevin Bond <kevinbond@gmail.com>
- *
  * @mixin Email
+ *
+ * @author Kevin Bond <kevinbond@gmail.com>
  */
 class TestEmail
 {
@@ -24,6 +27,45 @@ class TestEmail
     final public function __call($name, $arguments)
     {
         return $this->email->{$name}(...$arguments);
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string $class
+     *
+     * @return T
+     */
+    final public function as(string $class): self
+    {
+        if (self::class === $class) {
+            return $this;
+        }
+
+        if (!\is_a($class, self::class, true)) {
+            throw new \InvalidArgumentException(\sprintf('$class must be a class that\'s an instance of "%s".', self::class));
+        }
+
+        return new $class($this->inner());
+    }
+
+    /**
+     * @param callable(TestEmail|Email):mixed $callback
+     *
+     * @return mixed
+     */
+    final public function call(callable $callback)
+    {
+        return Callback::createFor($callback)->invoke(Parameter::union(
+            Parameter::untyped($this),
+            Parameter::typed(Email::class, $this->inner()),
+            Parameter::typed(self::class, Parameter::factory(fn(string $class) => $this->as($class)))
+        ));
+    }
+
+    final public function inner(): Email
+    {
+        return $this->email;
     }
 
     /**
@@ -81,84 +123,36 @@ class TestEmail
         return $this;
     }
 
-    final public function assertFrom(string $expectedEmail, string $expectedName = ''): self
+    final public function assertSubjectContains(string $needle): self
     {
-        foreach ($this->email->getFrom() as $address) {
-            if ($expectedEmail !== $address->getAddress()) {
-                continue;
-            }
+        Assert::that($this->email->getSubject())->contains($needle);
 
-            Assert::that($address->getAddress())->is($expectedEmail);
-            Assert::that($address->getName())->is($expectedName);
-
-            return $this;
-        }
-
-        Assert::fail("Message does not have from [{$expectedEmail}]");
+        return $this;
     }
 
-    final public function assertTo(string $expectedEmail, string $expectedName = ''): self
+    final public function assertFrom(string $expectedEmail, ?string $expectedName = null): self
     {
-        foreach ($this->email->getTo() as $address) {
-            if ($expectedEmail !== $address->getAddress()) {
-                continue;
-            }
-
-            Assert::that($address->getAddress())->is($expectedEmail);
-            Assert::that($address->getName())->is($expectedName);
-
-            return $this;
-        }
-
-        Assert::fail("Message does not have to [{$expectedEmail}]");
+        return $this->assertEmail($this->email->getFrom(), $expectedEmail, $expectedName, 'from');
     }
 
-    final public function assertCc(string $expectedEmail, string $expectedName = ''): self
+    final public function assertTo(string $expectedEmail, ?string $expectedName = null): self
     {
-        foreach ($this->email->getCc() as $address) {
-            if ($expectedEmail !== $address->getAddress()) {
-                continue;
-            }
-
-            Assert::that($address->getAddress())->is($expectedEmail);
-            Assert::that($address->getName())->is($expectedName);
-
-            return $this;
-        }
-
-        Assert::fail("Message does not have cc [{$expectedEmail}]");
+        return $this->assertEmail($this->email->getTo(), $expectedEmail, $expectedName, 'to');
     }
 
-    final public function assertBcc(string $expectedEmail, string $expectedName = ''): self
+    final public function assertCc(string $expectedEmail, ?string $expectedName = null): self
     {
-        foreach ($this->email->getBcc() as $address) {
-            if ($expectedEmail !== $address->getAddress()) {
-                continue;
-            }
-
-            Assert::that($address->getAddress())->is($expectedEmail);
-            Assert::that($address->getName())->is($expectedName);
-
-            return $this;
-        }
-
-        Assert::fail("Message does not have bcc [{$expectedEmail}]");
+        return $this->assertEmail($this->email->getCc(), $expectedEmail, $expectedName, 'cc');
     }
 
-    final public function assertReplyTo(string $expectedEmail, string $expectedName = ''): self
+    final public function assertBcc(string $expectedEmail, ?string $expectedName = null): self
     {
-        foreach ($this->email->getReplyTo() as $address) {
-            if ($expectedEmail !== $address->getAddress()) {
-                continue;
-            }
+        return $this->assertEmail($this->email->getBcc(), $expectedEmail, $expectedName, 'bcc');
+    }
 
-            Assert::that($address->getAddress())->is($expectedEmail);
-            Assert::that($address->getName())->is($expectedName);
-
-            return $this;
-        }
-
-        Assert::fail("Message does not have reply-to [{$expectedEmail}]");
+    final public function assertReplyTo(string $expectedEmail, ?string $expectedName = null): self
+    {
+        return $this->assertEmail($this->email->getReplyTo(), $expectedEmail, $expectedName, 'reply-to');
     }
 
     /**
@@ -230,5 +224,43 @@ class TestEmail
         }
 
         return $this;
+    }
+
+    final public function dump(): self
+    {
+        \call_user_func(\function_exists('dump') ? 'dump' : 'var_dump', $this->email);
+
+        return $this;
+    }
+
+    final public function dd(): void
+    {
+        $this->dump();
+        exit(1);
+    }
+
+    /**
+     * @param Address[] $addresses
+     */
+    private function assertEmail(array $addresses, string $expectedEmail, ?string $expectedName, string $type): self
+    {
+        foreach ($addresses as $address) {
+            if ($expectedEmail !== $address->getAddress()) {
+                continue;
+            }
+
+            Assert::that($address->getAddress())->is($expectedEmail);
+
+            if (null !== $expectedName) {
+                Assert::that($address->getName())->is($expectedName);
+            }
+
+            return $this;
+        }
+
+        Assert::fail('Message does not have {type} {expected}', [
+            'type' => \mb_strtoupper($type),
+            'expected' => $expectedEmail, ]
+        );
     }
 }

@@ -74,6 +74,74 @@ class MyTest extends KernelTestCase // or WebTestCase
 **NOTE**: Emails are persisted between kernel reboots within each test. You can reset the
 collected emails with `$this->mailer()->reset()`.
 
+### SentEmails Collection
+
+You can access all the sent emails and filter down to just the ones you want to make assertions on.
+Most methods are fluent.
+
+```php
+use Symfony\Component\Mime\Email;
+use Zenstruck\Mailer\Test\SentEmails;
+use Zenstruck\Mailer\Test\TestEmail;
+
+/** @var SentEmails $sentEmails */
+$sentEmails = $this->mailer()->sentEmails();
+
+$sentEmails->all(); // TestEmail[]
+$sentEmails->raw(); // Email[]
+
+$sentEmails->first(); // First TestEmail in collection or fail if none
+$sentEmails->last(); // Last TestEmail in collection or fail
+$sentEmails->count(); // # of emails in collection
+$sentEmails->dump(); // dump() the collection
+$sentEmails->dd(); // dd() the collection
+
+$sentEmails->each(function(TestEmail $email) {
+    // do something with each email in collection
+});
+$sentEmails->each(function(Email $email) {
+    // can typehint as Email
+});
+
+// iterate over collection
+foreach ($sentEmails as $email) {
+    /** @var TestEmail $email */
+}
+
+// assertions
+$sentEmails->assertNone();
+$sentEmails->assertCount(5);
+
+// fails if collection is empty
+$sentEmails->ensureSome();
+$sentEmails->ensureSome('custom failure message');
+
+// filters - returns new instance of SentEmails
+$sentEmails->whereSubject('some subject'); // emails with subject "some subject"
+$sentEmails->whereSubjectContains('subject'); // emails where subject contains "subject"
+$sentEmails->whereFrom('sally@example.com'); // emails sent from "sally@example.com"
+$sentEmails->whereTo('sally@example.com'); // emails sent to "sally@example.com"
+$sentEmails->whereCc('sally@example.com'); // emails cc'd to "sally@example.com"
+$sentEmails->whereBcc('sally@example.com'); // emails bcc'd to "sally@example.com"
+$sentEmails->whereReplyTo('sally@example.com'); // emails with "sally@example.com" as a reply-to
+$sentEmails->whereTag('password-reset'); // emails with "password-reset" tag (https://symfony.com/doc/current/mailer.html#adding-tags-and-metadata-to-emails)
+
+// custom filter
+$sentEmails->where(function(TestEmail $email): bool {
+    return 'password-reset' === $email->tag() && 'Some subject' === $email->getSubject();
+});
+
+// combine filters
+$sentEmails
+    ->whereTag('password-reset')
+    ->assertCount(2)
+    ->each(function(TestEmail $email) {
+        $email->assertSubjectContains('Password Reset');
+    })
+    ->whereTo('kevin@example.com')
+    ->assertCount(1)
+```
+
 ### Custom TestEmail
 
 The `TestEmail` class shown above is a decorator for `\Symfony\Component\Mime\Email`
@@ -106,19 +174,26 @@ use Zenstruck\Mailer\Test\InteractsWithMailer;
 
 class MyTest extends KernelTestCase // or WebTestCase
 {
-use InteractsWithMailer;
+    use InteractsWithMailer;
 
     public function test_something(): void
     {
         // ...some code that sends emails...
-
-        $this->mailer()->sentTestEmails(AppTestEmail::class); // AppTestEmail[]
 
         // Type-hinting the callback with your custom TestEmail triggers it to be
         // injected instead of the standard TestEmail.
         $this->mailer()->assertEmailSentTo('kevin@example.com', function(AppTestEmail $email) {
             $email->assertHasPostmarkTag('password-reset');
         });
+
+        $this->mailer()->sentEmails()->each(function(AppTestEmail $email) {
+            $email->assertHasPostmarkTag('password-reset');
+        });
+
+        // add your custom TestEmail as an argument to these methods to change the return type
+        $this->mailer()->sentEmails()->first(AppTestEmail::class); // AppTestEmail
+        $this->mailer()->sentEmails()->last(AppTestEmail::class); // AppTestEmail
+        $this->mailer()->sentEmails()->all(AppTestEmail::class); // AppTestEmail[]
     }
 }
 ```
@@ -160,6 +235,8 @@ $browser
                 // see Usage section above for full API
             })
         ;
+
+        $component->sentEmails(); \Zenstruck\Mailer\Test\SentEmails
     })
 ;
 ```

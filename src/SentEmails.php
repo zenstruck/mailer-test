@@ -100,7 +100,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
      */
     public function where(callable $filter): self
     {
-        return new self(...\array_filter($this->emails, $filter));
+        return new self(...\array_filter($this->emails, static fn(TestEmail $email) => $email->call($filter)));
     }
 
     public function whereSubject(string $subject): self

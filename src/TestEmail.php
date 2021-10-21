@@ -116,6 +116,9 @@ class TestEmail
         return $metadata;
     }
 
+    /**
+     * @return static
+     */
     final public function assertSubject(string $expected): self
     {
         Assert::that($this->email->getSubject())->is($expected);
@@ -123,6 +126,9 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertSubjectContains(string $needle): self
     {
         Assert::that($this->email->getSubject())->contains($needle);
@@ -130,26 +136,41 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertFrom(string $expectedEmail, ?string $expectedName = null): self
     {
         return $this->assertEmail($this->email->getFrom(), $expectedEmail, $expectedName, 'from');
     }
 
+    /**
+     * @return static
+     */
     final public function assertTo(string $expectedEmail, ?string $expectedName = null): self
     {
         return $this->assertEmail($this->email->getTo(), $expectedEmail, $expectedName, 'to');
     }
 
+    /**
+     * @return static
+     */
     final public function assertCc(string $expectedEmail, ?string $expectedName = null): self
     {
         return $this->assertEmail($this->email->getCc(), $expectedEmail, $expectedName, 'cc');
     }
 
+    /**
+     * @return static
+     */
     final public function assertBcc(string $expectedEmail, ?string $expectedName = null): self
     {
         return $this->assertEmail($this->email->getBcc(), $expectedEmail, $expectedName, 'bcc');
     }
 
+    /**
+     * @return static
+     */
     final public function assertReplyTo(string $expectedEmail, ?string $expectedName = null): self
     {
         return $this->assertEmail($this->email->getReplyTo(), $expectedEmail, $expectedName, 'reply-to');
@@ -157,6 +178,8 @@ class TestEmail
 
     /**
      * Ensure both html and text contents contain the expected string.
+     *
+     * @return static
      */
     final public function assertContains(string $expected): self
     {
@@ -166,6 +189,9 @@ class TestEmail
         ;
     }
 
+    /**
+     * @return static
+     */
     final public function assertHtmlContains(string $expected): self
     {
         Assert::that($this->email->getHtmlBody())
@@ -175,6 +201,9 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertTextContains(string $expected): self
     {
         Assert::that($this->email->getTextBody())
@@ -184,6 +213,9 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertHasFile(string $expectedFilename, string $expectedContentType, string $expectedContents): self
     {
         foreach ($this->email->getAttachments() as $attachment) {
@@ -202,6 +234,9 @@ class TestEmail
         Assert::fail("Message does not include file with filename [{$expectedFilename}]");
     }
 
+    /**
+     * @return static
+     */
     final public function assertHasTag(string $expected): self
     {
         Assert::that($this->tags())
@@ -212,6 +247,9 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function assertHasMetadata(string $expectedKey, ?string $expectedValue = null): self
     {
         Assert::that($metadata = $this->metadata())->isNotEmpty('No metadata found.');
@@ -226,6 +264,9 @@ class TestEmail
         return $this;
     }
 
+    /**
+     * @return static
+     */
     final public function dump(): self
     {
         \call_user_func(\function_exists('dump') ? 'dump' : 'var_dump', $this->email);

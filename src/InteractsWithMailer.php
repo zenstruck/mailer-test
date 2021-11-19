@@ -33,14 +33,16 @@ trait InteractsWithMailer
             throw new \LogicException(\sprintf('The %s trait can only be used with %s.', __TRAIT__, KernelTestCase::class));
         }
 
-        if (!self::$container) {
+        if (!self::$booted) {
             throw new \LogicException('The kernel must be booted before accessing the mailer.');
         }
 
-        if (!self::$container->has('zenstruck_mailer_test.mailer')) {
+        $container = \method_exists(self::class, 'getContainer') ? self::getContainer() : self::$container;
+
+        if (!$container->has('zenstruck_mailer_test.mailer')) {
             throw new \LogicException(\sprintf('Cannot access test mailer - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
         }
 
-        return self::$container->get('zenstruck_mailer_test.mailer');
+        return $container->get('zenstruck_mailer_test.mailer');
     }
 }

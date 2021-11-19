@@ -16,7 +16,7 @@ use Zenstruck\Mailer\Test\ZenstruckMailerTestBundle;
  */
 final class InteractsWithMailerTest extends KernelTestCase
 {
-    use EnvironmentProvider, InteractsWithMailer;
+    use ContainerBC, EnvironmentProvider, InteractsWithMailer;
 
     /**
      * @test
@@ -51,7 +51,7 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel(['environment' => $environment]);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->mailer()
             ->assertSentEmailCount(1)
@@ -93,7 +93,7 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel(['environment' => $environment]);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('No email was sent to "jim@example.com".');
@@ -112,7 +112,7 @@ final class InteractsWithMailerTest extends KernelTestCase
         $email = new Email1();
         $email->getHeaders()->addTextHeader('X-PM-Tag', 'reset-password');
 
-        self::$container->get('mailer')->send($email);
+        self::container()->get('mailer')->send($email);
 
         $this->mailer()->assertEmailSentTo('kevin@example.com', function(CustomTestEmail $email) {
             $email->assertHasPostmarkTag('reset-password');
@@ -127,7 +127,7 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel(['environment' => $environment]);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->assertInstanceOf(TestEmail::class, $this->mailer()->sentEmails()->all()[0]);
     }
@@ -140,7 +140,7 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel(['environment' => $environment]);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->assertInstanceOf(CustomTestEmail::class, $this->mailer()->sentEmails()->all(CustomTestEmail::class)[0]);
     }
@@ -150,9 +150,7 @@ final class InteractsWithMailerTest extends KernelTestCase
      */
     public function sent_test_email_argument_must_be_an_instance_of_test_email(): void
     {
-        self::bootKernel();
-
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->expectException(\InvalidArgumentException::class);
 
@@ -177,7 +175,7 @@ final class InteractsWithMailerTest extends KernelTestCase
     {
         self::bootKernel(['environment' => 'no_profiler']);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->mailer()->assertSentEmailCount(1);
     }
@@ -192,7 +190,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         $this->mailer()->assertNoEmailSent();
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->mailer()->assertSentEmailCount(1);
 
@@ -213,7 +211,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         $this->mailer()->assertNoEmailSent();
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->mailer()
             ->assertSentEmailCount(1)
@@ -225,7 +223,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::bootKernel(['environment' => $environment]);
 
-        self::$container->get('mailer')->send(new Email1());
+        self::container()->get('mailer')->send(new Email1());
 
         $this->mailer()->assertSentEmailCount(1);
     }

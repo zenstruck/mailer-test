@@ -6,6 +6,7 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Zenstruck\Assert;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
@@ -24,15 +25,20 @@ class TestEmail
         $this->email = $email;
     }
 
-    final public function __call($name, $arguments)
+    /**
+     * @param mixed[] $arguments
+     *
+     * @return mixed
+     */
+    final public function __call(string $name, array $arguments)
     {
         return $this->email->{$name}(...$arguments);
     }
 
     /**
-     * @template T
+     * @template T of self
      *
-     * @param class-string $class
+     * @param class-string<T> $class
      *
      * @return T
      */
@@ -50,16 +56,21 @@ class TestEmail
     }
 
     /**
-     * @param callable(TestEmail|Email):mixed $callback
+     * @template T
      *
-     * @return mixed
+     * @param callable(TestEmail|Email):T $callback
+     *
+     * @return T
      */
     final public function call(callable $callback)
     {
         return Callback::createFor($callback)->invoke(Parameter::union(
             Parameter::untyped($this),
             Parameter::typed(Email::class, $this->inner()),
-            Parameter::typed(self::class, Parameter::factory(fn(string $class) => $this->as($class)))
+            Parameter::typed(self::class, Parameter::factory(function(string $class) {
+                /** @var class-string<TestEmail> $class */
+                return $this->as($class);
+            }))
         ));
     }
 
@@ -219,12 +230,19 @@ class TestEmail
     final public function assertHasFile(string $expectedFilename, string $expectedContentType, string $expectedContents): self
     {
         foreach ($this->email->getAttachments() as $attachment) {
-            if ($expectedFilename !== $attachment->getPreparedHeaders()->get('content-disposition')->getParameter('filename')) {
+            /** @var ParameterizedHeader $header */
+            $header = $attachment->getPreparedHeaders()->get('content-disposition');
+
+            if ($expectedFilename !== $header->getParameter('filename')) {
                 continue;
             }
 
             Assert::that($attachment->getBody())->is($expectedContents);
-            Assert::that($attachment->getPreparedHeaders()->get('content-type')->getBodyAsString())
+
+            /** @var ParameterizedHeader $header */
+            $header = $attachment->getPreparedHeaders()->get('content-type');
+
+            Assert::that($header->getBodyAsString())
                 ->is($expectedContentType.'; name='.$expectedFilename)
             ;
 
@@ -282,6 +300,8 @@ class TestEmail
 
     /**
      * @param Address[] $addresses
+     *
+     * @return static
      */
     private function assertEmail(array $addresses, string $expectedEmail, ?string $expectedName, string $type): self
     {

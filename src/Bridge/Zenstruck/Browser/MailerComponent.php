@@ -2,6 +2,7 @@
 
 namespace Zenstruck\Mailer\Test\Bridge\Zenstruck\Browser;
 
+use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
 use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
 use Zenstruck\Mailer\Test\SentEmailMixin;
@@ -26,6 +27,9 @@ final class MailerComponent extends Component
             throw new \RuntimeException('The profiler does not include the "mailer" collector. Is symfony/mailer installed?');
         }
 
-        return SentEmails::fromEvents($browser->profile()->getCollector('mailer')->getEvents());
+        /** @var MessageDataCollector $collector */
+        $collector = $browser->profile()->getCollector('mailer');
+
+        return SentEmails::fromEvents($collector->getEvents());
     }
 }

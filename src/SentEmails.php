@@ -11,6 +11,8 @@ use Zenstruck\Assert;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
+ *
+ * @implements \IteratorAggregate<TestEmail>
  */
 final class SentEmails implements \IteratorAggregate, \Countable
 {
@@ -55,9 +57,9 @@ final class SentEmails implements \IteratorAggregate, \Countable
     /**
      * Get the first email in the collection - fail if none.
      *
-     * @template T
+     * @template T of TestEmail
      *
-     * @param class-string $class
+     * @param class-string<T> $class
      *
      * @return T
      */
@@ -69,9 +71,9 @@ final class SentEmails implements \IteratorAggregate, \Countable
     /**
      * Get the last email in the collection - fail if none.
      *
-     * @template T
+     * @template T of TestEmail
      *
-     * @param class-string $class
+     * @param class-string<T> $class
      *
      * @return T
      */
@@ -111,7 +113,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     public function whereSubjectContains(string $needle): self
     {
-        return $this->where(fn(Email $email) => str_contains($email->getSubject(), $needle));
+        return $this->where(fn(Email $email) => str_contains((string) $email->getSubject(), $needle));
     }
 
     public function whereTag(string $tag): self
@@ -152,7 +154,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return never-return
+     * @return never
      */
     public function dd(): void
     {
@@ -161,9 +163,9 @@ final class SentEmails implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @template T
+     * @template T of TestEmail
      *
-     * @param class-string $class
+     * @param class-string<T> $class
      *
      * @return TestEmail[]|T[]
      */
@@ -194,6 +196,9 @@ final class SentEmails implements \IteratorAggregate, \Countable
         return $this->assertCount(0);
     }
 
+    /**
+     * @param array<string|int,mixed> $context
+     */
     public function ensureSome(string $message = 'No emails.', array $context = []): self
     {
         if (0 === \count($this->emails)) {

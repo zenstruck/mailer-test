@@ -7,6 +7,9 @@ namespace Zenstruck\Mailer\Test\Tests;
  */
 trait EnvironmentProvider
 {
+    /**
+     * @return array<array<string>>
+     */
     public static function environmentProvider(): iterable
     {
         yield ['test'];

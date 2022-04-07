@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 use Zenstruck\Mailer\Test\ZenstruckMailerTestBundle;
 
 /**
@@ -40,24 +39,13 @@ final class Kernel extends BaseKernel
         }
     }
 
-    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    private function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $loader->load(\sprintf('%s/config/%s.yaml', __DIR__, $this->getEnvironment()));
     }
 
-    /**
-     * @param RouteCollectionBuilder|RoutingConfigurator $routes
-     */
-    protected function configureRoutes($routes): void
+    private function configureRoutes(RoutingConfigurator $routes): void
     {
-        if ($routes instanceof RouteCollectionBuilder) {
-            // BC
-            $routes->add('/no-email', 'kernel::noEmail');
-            $routes->add('/send-email', 'kernel::sendEmail');
-
-            return;
-        }
-
         $routes->add('no-email', '/no-email')->controller('kernel::noEmail');
         $routes->add('send-email', '/send-email')->controller('kernel::sendEmail');
     }

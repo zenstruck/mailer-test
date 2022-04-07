@@ -3,8 +3,8 @@
 namespace Zenstruck\Mailer\Test\Bridge\Zenstruck\Browser;
 
 use Symfony\Component\Mailer\DataCollector\MessageDataCollector;
-use Zenstruck\Browser\BrowserKitBrowser;
 use Zenstruck\Browser\Component;
+use Zenstruck\Browser\KernelBrowser;
 use Zenstruck\Mailer\Test\SentEmailMixin;
 use Zenstruck\Mailer\Test\SentEmails;
 
@@ -19,8 +19,8 @@ final class MailerComponent extends Component
     {
         $browser = $this->browser();
 
-        if (!$browser instanceof BrowserKitBrowser) {
-            throw new \RuntimeException(\sprintf('The "Mailer" component requires the browser be a %s.', BrowserKitBrowser::class));
+        if (!$browser instanceof KernelBrowser) {
+            throw new \RuntimeException(\sprintf('The "Mailer" component requires the browser be a %s.', KernelBrowser::class));
         }
 
         if (!$browser->profile()->hasCollector('mailer')) {

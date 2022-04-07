@@ -26,11 +26,6 @@ parameters:
 			path: src/TestEmail.php
 
 		-
-			message: "#^Method Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\:\\:as\\(\\) should return T of Zenstruck\\\\Mailer\\\\Test\\\\TestEmail but returns object\\.$#"
-			count: 1
-			path: src/TestEmail.php
-
-		-
 			message: "#^Parameter \\#1 \\$events of static method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:fromEvents\\(\\) expects Symfony\\\\Component\\\\Mailer\\\\Event\\\\MessageEvents, Symfony\\\\Component\\\\Mailer\\\\Event\\\\MessageEvents\\|null given\\.$#"
 			count: 1
 			path: src/TestMailer.php

@@ -37,12 +37,10 @@ trait InteractsWithMailer
             throw new \LogicException('The kernel must be booted before accessing the mailer.');
         }
 
-        $container = \method_exists(self::class, 'getContainer') ? self::getContainer() : self::$container;
-
-        if (!$container->has('zenstruck_mailer_test.mailer')) {
+        if (!self::getContainer()->has('zenstruck_mailer_test.mailer')) {
             throw new \LogicException(\sprintf('Cannot access test mailer - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
         }
 
-        return $container->get('zenstruck_mailer_test.mailer');
+        return self::getContainer()->get('zenstruck_mailer_test.mailer');
     }
 }

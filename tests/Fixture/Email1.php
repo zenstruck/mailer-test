@@ -32,6 +32,7 @@ final class Email1 extends Email
             ->bcc('bcc@example.com')
             ->replyTo('reply@example.com')
             ->attachFromPath(__DIR__.'/files/attachment.txt')
+            ->attachFromPath(__DIR__.'/files/attachment.txt', 'name with space.txt')
             ->subject('email subject')
             ->html('html body')
             ->text('text body')

@@ -236,8 +236,11 @@ class TestEmail
     /**
      * @return static
      */
-    final public function assertHasFile(string $expectedFilename, string $expectedContentType, string $expectedContents): self
-    {
+    final public function assertHasFile(
+        string $expectedFilename,
+        ?string $expectedContentType = null,
+        ?string $expectedContents = null
+    ): self {
         foreach ($this->email->getAttachments() as $attachment) {
             /** @var ParameterizedHeader $header */
             $header = $attachment->getPreparedHeaders()->get('content-disposition');
@@ -246,14 +249,20 @@ class TestEmail
                 continue;
             }
 
-            Assert::that($attachment->getBody())->is($expectedContents);
+            Assert::pass();
+
+            if ($expectedContents) {
+                Assert::that($attachment->getBody())->is($expectedContents);
+            }
+
+            if (!$expectedContentType) {
+                return $this;
+            }
 
             /** @var ParameterizedHeader $header */
             $header = $attachment->getPreparedHeaders()->get('content-type');
 
-            Assert::that($header->getBodyAsString())
-                ->is($expectedContentType.'; name='.$expectedFilename)
-            ;
+            Assert::that($header->getValue())->is($expectedContentType);
 
             return $this;
         }

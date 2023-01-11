@@ -76,7 +76,10 @@ final class InteractsWithMailerTest extends KernelTestCase
                     ->assertHtmlContains('html body')
                     ->assertTextContains('text body')
                     ->assertContains('body')
+                    ->assertHasFile('attachment.txt')
+                    ->assertHasFile('attachment.txt', 'text/plain')
                     ->assertHasFile('attachment.txt', 'text/plain', "attachment contents\n")
+                    ->assertHasFile('name with space.txt', 'text/plain', "attachment contents\n")
                 ;
 
                 // TestEmail can call underlying Symfony\Component\Mime\Email methods

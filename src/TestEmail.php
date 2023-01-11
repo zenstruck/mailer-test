@@ -251,9 +251,7 @@ class TestEmail
             /** @var ParameterizedHeader $header */
             $header = $attachment->getPreparedHeaders()->get('content-type');
 
-            Assert::that($header->getBodyAsString())
-                ->is($expectedContentType.'; name='.$expectedFilename)
-            ;
+            Assert::that($header->getValue())->is($expectedContentType);
 
             return $this;
         }

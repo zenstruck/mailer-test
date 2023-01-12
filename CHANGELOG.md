@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [v1.2.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.2.0)
+
+January 12th, 2023 - [v1.1.0...v1.2.0](https://github.com/zenstruck/mailer-test/compare/v1.1.0...v1.2.0)
+
+* 673510d feat: make some `TestEmail::assertHasFile()` parameters optional (#20) by @kbond
+* a60b4e7 fix: `TestEmail::assertHasFile()` (#20) by @kbond
+* f3ede9c fix(ci): add token by @kbond
+* 76d39b5 chore(ci): fix by @kbond
+* f8f8763 ci: fix (#18) by @kbond
+* 3a594fc [minor] support Symfony 6.1 (#16) by @kbond
+
 ## [v1.1.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.1.0)
 
 April 7th, 2022 - [v1.0.0...v1.1.0](https://github.com/zenstruck/mailer-test/compare/v1.0.0...v1.1.0)

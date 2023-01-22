@@ -122,7 +122,7 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     public function whereSubjectContains(string $needle): self
     {
-        return $this->where(fn(Email $email) => str_contains((string) $email->getSubject(), $needle));
+        return $this->where(fn(Email $email) => \str_contains((string) $email->getSubject(), $needle));
     }
 
     public function whereTag(string $tag): self

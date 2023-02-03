@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.3.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.3.0)
+
+February 3rd, 2023 - [v1.2.0...v1.3.0](https://github.com/zenstruck/mailer-test/compare/v1.2.0...v1.3.0)
+
+* bb45289 feat: allow asserting on Signed emails (#24) by @kbond
+* fbb32ae feat: require php 8+ (#22) by @kbond
+
 ## [v1.2.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.2.0)
 
 January 12th, 2023 - [v1.1.0...v1.2.0](https://github.com/zenstruck/mailer-test/compare/v1.1.0...v1.2.0)

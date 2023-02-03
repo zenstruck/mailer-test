@@ -215,7 +215,7 @@ class TestEmail
     final public function assertHtmlContains(string $expected): self
     {
         Assert::that($this->email->getHtmlBody())
-            ->contains($expected, 'The [text/html] part does not contain "{expected}".')
+            ->contains($expected, 'The [text/html] part does not contain "{needle}".')
         ;
 
         return $this;
@@ -227,7 +227,7 @@ class TestEmail
     final public function assertTextContains(string $expected): self
     {
         Assert::that($this->email->getTextBody())
-            ->contains($expected, 'The [text/plain] part does not contain "{expected}".')
+            ->contains($expected, 'The [text/plain] part does not contain "{needle}".')
         ;
 
         return $this;

@@ -15,6 +15,11 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvents;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\AbstractMultipartPart;
+use Symfony\Component\Mime\Part\AbstractPart;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\RawMessage;
 use Zenstruck\Assert;
 
@@ -55,10 +60,10 @@ final class SentEmails implements \IteratorAggregate, \Countable
         $messages = \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events);
 
         // remove non Email messages
-        $messages = \array_filter($messages, static fn(RawMessage $message) => $message instanceof Email);
+        $messages = \array_filter($messages, static fn(RawMessage $message) => $message instanceof Message);
 
         // convert to TestEmails
-        $messages = \array_map(static fn(Email $email) => new TestEmail($email), $messages);
+        $messages = \array_map([self::class, 'convertMessageToEmail'], $messages);
 
         return new self(...$messages);
     }
@@ -242,5 +247,47 @@ final class SentEmails implements \IteratorAggregate, \Countable
         }
 
         return false;
+    }
+
+    private static function convertMessageToEmail(Message $message): TestEmail
+    {
+        if ($message instanceof Email) {
+            return new TestEmail($message);
+        }
+
+        $email = new Email($message->getHeaders());
+
+        if (!$body = $message->getBody()) {
+            return new TestEmail($email);
+        }
+
+        foreach (self::textParts($body) as $part) {
+            match (true) {
+                $part instanceof DataPart => \method_exists($email, 'addPart') ? $email->addPart($part) : $email->attachPart($part),
+                'plain' === $part->getMediaSubtype() => $email->text($part->getBody()),
+                'html' === $part->getMediaSubtype() => $email->html($part->getBody()),
+                default => null,
+            };
+        }
+
+        return new TestEmail($email);
+    }
+
+    /**
+     * @return TextPart[]
+     */
+    private static function textParts(AbstractPart $part): iterable
+    {
+        if ($part instanceof TextPart) {
+            yield $part;
+        }
+
+        if (!$part instanceof AbstractMultipartPart) {
+            return;
+        }
+
+        foreach ($part->getParts() as $subPart) {
+            yield from self::textParts($subPart);
+        }
     }
 }

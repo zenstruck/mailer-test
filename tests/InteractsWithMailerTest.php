@@ -13,6 +13,7 @@ namespace Zenstruck\Mailer\Test\Tests;
 
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Zenstruck\Mailer\Test\InteractsWithMailer;
 use Zenstruck\Mailer\Test\TestEmail;
@@ -26,6 +27,24 @@ use Zenstruck\Mailer\Test\ZenstruckMailerTestBundle;
 final class InteractsWithMailerTest extends KernelTestCase
 {
     use EnvironmentProvider, InteractsWithMailer;
+
+    private const PRIVATE_KEY = <<<EOF
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXAIBAAKBgQC6lQYNOMaboSOE/c2KNl8Rwk61zoMXrEmXC926an3/jHrtj9wB
+        ndP2DY2nUyz0vpmJlcDOjDwTGs8U/C7zn7PDdZ8EuuxlAa7oNo/38YYV+5Oki93m
+        io6rGV8zLMGLLygAB1sJaJVP5W9wm0RLY776YFL4V/nekA5ZTnA4+KaIYwIDAQAB
+        AoGAJLhjgoKkA8kI1omkxAjDWRlmqD1Ga4hKy2FYd/GxbnPVVZ+0atUG/Cvarw2d
+        kWVZjkxcr8nFoPTrwHOJQgUyOXWLuIuirznoTtDKzC+4JlDsZJd8hkVohqwKfdPA
+        v4iYceN6V0YRQpsLVwKJinr5k6oHpCGs3sNffpHQzrXc24ECQQDb0JLiMm5OZoYZ
+        G3739DsYVycUmYmYJtXuUBHTIwBAaOyo0yEmeQ8Li4H5dSSWqeOO0XrfP7cQ3TOm
+        6LuSrIXDAkEA2Uv2PuteQXGSzOEuQbDbYeR0Le0drDUFJkXBM4oS3XB3wx2+umD+
+        WqpfLEIXWV3/hkuottTmlsQuuAP3Xv+o4QJAf5FyTRfbcGCLnnKYoyn4Sc36fjgE
+        5GpVaXLKhXAgq0C5Z9jvujYzhw21pqJXU6DQ0Ye8+WcuxPi7Czix8xNwpQJBAMm1
+        vexCSMivSPpuvaW1KrEAhOhtB/JndVRFxEa3kTOFx2aUIgyZJQO8y4QmBc6rdxuO
+        +BpgH30st8GRzPuej4ECQAsLon/QgsyhkfquBMLDC1uhO027K59C/aYRlufPyHkq
+        HIyrMg2pQ46h2ybEuB50Cs+xF19KwBuGafBtRjkvXdU=
+        -----END RSA PRIVATE KEY-----
+        EOF;
 
     /**
      * @test
@@ -251,5 +270,58 @@ final class InteractsWithMailerTest extends KernelTestCase
         $this->expectExceptionMessage(\sprintf('Cannot access test mailer - is %s enabled in your test environment?', ZenstruckMailerTestBundle::class));
 
         $this->mailer();
+    }
+
+    /**
+     * @test
+     * @dataProvider environmentProvider
+     */
+    public function can_get_signed_emails(string $environment): void
+    {
+        self::bootKernel(['environment' => $environment]);
+
+        $signer = new DkimSigner(self::PRIVATE_KEY, 'testdkim.symfony.net', 'sf');
+        $email1 = $signer->sign(new Email1());
+        $email2 = $signer->sign((new Email())->from('kevin@example.com')->to('html@example.com')->html('some html'));
+        $email3 = $signer->sign((new Email())->from('kevin@example.com')->to('text@example.com')->text('some text'));
+
+        self::getContainer()->get('mailer')->send($email1);
+        self::getContainer()->get('mailer')->send($email2);
+        self::getContainer()->get('mailer')->send($email3);
+
+        $this->mailer()->sentEmails()->assertCount(3);
+        $this->mailer()
+            ->assertEmailSentTo('kevin@example.com', 'email subject')
+            ->assertEmailSentTo('kevin@example.com', function(TestEmail $email) {
+                $email
+                    ->assertTo('kevin@example.com', 'Kevin')
+                    ->assertFrom('webmaster@example.com')
+                    ->assertCc('cc@example.com')
+                    // ->assertBcc('bcc@example.com') // BCC is removed - see https://github.com/symfony/symfony/issues/48566
+                    ->assertReplyTo('reply@example.com')
+                    ->assertSubjectContains('sub')
+                    ->assertHtmlContains('html body')
+                    ->assertTextContains('text body')
+                    ->assertContains('body')
+                    ->assertHasFile('attachment.txt')
+                    ->assertHasFile('attachment.txt', 'text/plain')
+                    ->assertHasFile('attachment.txt', 'text/plain', "attachment contents\n")
+                    ->assertHasFile('name with space.txt', 'text/plain', "attachment contents\n")
+                ;
+
+                // TestEmail can call underlying Symfony\Component\Mime\Email methods
+                $this->assertSame('Kevin', $email->getTo()[0]->getName());
+            })
+            ->assertEmailSentTo('text@example.com', function(TestEmail $email) {
+                $email
+                    ->assertTextContains('some text')
+                ;
+            })
+            ->assertEmailSentTo('html@example.com', function(TestEmail $email) {
+                $email
+                    ->assertHtmlContains('some html')
+                ;
+            })
+        ;
     }
 }

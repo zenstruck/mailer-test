@@ -25,6 +25,7 @@
         "symfony/phpunit-bridge": "^6.0",
         "symfony/var-dumper": "^5.4|^6.0",
         "symfony/yaml": "^5.4|^6.0",
+        "zenstruck/assert-html": "^0.2.1",
         "zenstruck/browser": "^1.0"
     },
     "config": {

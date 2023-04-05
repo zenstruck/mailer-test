@@ -34,7 +34,7 @@ final class Email1 extends Email
             ->attachFromPath(__DIR__.'/files/attachment.txt')
             ->attachFromPath(__DIR__.'/files/attachment.txt', 'name with space.txt')
             ->subject('email subject')
-            ->html('html body')
+            ->html('<h1>title</h1><div>html body</div>')
             ->text('text body')
         ;
 

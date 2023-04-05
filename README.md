@@ -52,7 +52,17 @@ class MyTest extends KernelTestCase // or WebTestCase
                 ->assertTextContains('some text')
                 ->assertHtmlContains('some text')
                 ->assertContains('some text') // asserts text and html both contain a value
-                ->assertHasFile('file.txt', 'text/plain', 'Hello there!')
+
+                // html assertions (requires zenstruck/assert-html)
+                ->assertHtml()
+                    ->contains('some text')
+                    ->containsIn('h1', 'some title')
+                ->back() // go back to the TestEmail
+
+                // attachment assertions
+                ->assertHasFile('file.txt') // that file.txt is attached
+                ->assertHasFile('file.txt', 'text/plain') // that file.txt is attached with content type "text/plain"
+                ->assertHasFile('file.txt', 'text/plain', 'Hello there!') // that file.txt is attached with content type "text/plain" and content is "Hello there!"
 
                 // tag/meta data assertions (https://symfony.com/doc/current/mailer.html#adding-tags-and-metadata-to-emails)
                 ->assertHasTag('password-reset')
@@ -70,8 +80,12 @@ class MyTest extends KernelTestCase // or WebTestCase
 }
 ```
 
-**NOTE**: Emails are persisted between kernel reboots within each test. You can reset the
-collected emails with `$this->mailer()->reset()`.
+> **Note**: Emails are persisted between kernel reboots within each test. You can reset the
+> collected emails with `$this->mailer()->reset()`.
+
+> **Note**: `assertHtml()` requires [`zenstruck/assert-html`](https://github.com/zenstruck/assert-html).
+> Install with `composer require --dev zenstruck/assert-html`. [View documentation for all
+> available assertions](https://github.com/zenstruck/assert#html-expectations).
 
 ### SentEmails Collection
 

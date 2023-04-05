@@ -17,8 +17,10 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Zenstruck\Assert;
+use Zenstruck\Assert\HtmlExpectation as BaseHtmlException;
 use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
+use Zenstruck\Mailer\Test\Expectation\HtmlExpectation;
 
 /**
  * @mixin Email
@@ -298,6 +300,17 @@ class TestEmail
         }
 
         return $this;
+    }
+
+    public function assertHtml(): HtmlExpectation
+    {
+        if (!\class_exists(BaseHtmlException::class)) {
+            throw new \LogicException('zenstruck/assert-html is required to use the HTML assertions (composer require --dev zenstruck/assert-html).');
+        }
+
+        Assert::that($this->email->getHtmlBody())->isNotEmpty('No [text/html] part found.');
+
+        return new HtmlExpectation((string) $this->email->getHtmlBody(), $this);
     }
 
     /**

@@ -4,7 +4,7 @@
     "homepage": "https://github.com/zenstruck/mailer-test",
     "type": "library",
     "license": "MIT",
-    "keywords": ["mailer", "symfony", "test"],
+    "keywords": ["mailer", "symfony", "test", "dev"],
     "authors": [
         {
             "name": "Kevin Bond",
@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "symfony/framework-bundle": "^5.4|^6.0",
+        "symfony/framework-bundle": "^5.4|^6.0|^7.0",
         "symfony/mailer": "^5.4|^6.0",
         "zenstruck/assert": "^1.0",
         "zenstruck/callback": "^1.1"
@@ -21,10 +21,10 @@
     "require-dev": {
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5.0",
-        "symfony/messenger": "^5.4|^6.0",
-        "symfony/phpunit-bridge": "^6.0",
-        "symfony/var-dumper": "^5.4|^6.0",
-        "symfony/yaml": "^5.4|^6.0",
+        "symfony/messenger": "^5.4|^6.0|^7.0",
+        "symfony/phpunit-bridge": "^6.0|^7.0",
+        "symfony/var-dumper": "^5.4|^6.0|^7.0",
+        "symfony/yaml": "^5.4|^6.0|^7.0",
         "zenstruck/browser": "^1.0"
     },
     "config": {

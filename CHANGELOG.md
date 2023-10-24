@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.4.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.0)
+
+October 24th, 2023 - [v1.3.0...v1.4.0](https://github.com/zenstruck/mailer-test/compare/v1.3.0...v1.4.0)
+
+* 93306fb feat: Symfony 7 support (#26) by @kbond
+
 ## [v1.3.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.3.0)
 
 February 3rd, 2023 - [v1.2.0...v1.3.0](https://github.com/zenstruck/mailer-test/compare/v1.2.0...v1.3.0)

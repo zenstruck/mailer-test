@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v1.4.1](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.1)
+
+October 25th, 2023 - [v1.4.0...v1.4.1](https://github.com/zenstruck/mailer-test/compare/v1.4.0...v1.4.1)
+
+* 3177e7d fix: allow 7.0+ for `symfony/mailer` (#27) by @kbond
+
 ## [v1.4.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.0)
 
 October 24th, 2023 - [v1.3.0...v1.4.0](https://github.com/zenstruck/mailer-test/compare/v1.3.0...v1.4.0)

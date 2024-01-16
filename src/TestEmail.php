@@ -79,7 +79,7 @@ class TestEmail
             Parameter::typed(self::class, Parameter::factory(function(string $class) {
                 /** @var class-string<TestEmail> $class */
                 return $this->as($class);
-            }))
+            })),
         ));
     }
 
@@ -239,7 +239,7 @@ class TestEmail
     final public function assertHasFile(
         string $expectedFilename,
         ?string $expectedContentType = null,
-        ?string $expectedContents = null
+        ?string $expectedContents = null,
     ): self {
         foreach ($this->email->getAttachments() as $attachment) {
             /** @var ParameterizedHeader $header */
@@ -339,7 +339,7 @@ class TestEmail
 
         Assert::fail('Message does not have {type} {expected}', [
             'type' => \mb_strtoupper($type),
-            'expected' => $expectedEmail, ]
+            'expected' => $expectedEmail, ],
         );
     }
 }

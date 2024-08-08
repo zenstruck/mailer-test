@@ -11,6 +11,8 @@
 
 namespace Zenstruck\Mailer\Test;
 
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -22,6 +24,7 @@ trait InteractsWithMailer
      * @internal
      * @before
      */
+    #[Before]
     final protected static function _startTestMailer(): void
     {
         TestMailer::start();
@@ -31,6 +34,7 @@ trait InteractsWithMailer
      * @internal
      * @after
      */
+    #[Before]
     final protected static function _stopTestMailer(): void
     {
         TestMailer::stop();

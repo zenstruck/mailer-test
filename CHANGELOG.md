@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v1.4.2](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.2)
+
+August 15th, 2024 - [v1.4.1...v1.4.2](https://github.com/zenstruck/mailer-test/compare/v1.4.1...v1.4.2)
+
+* 8d75e40 fix: PHPUnit deprecation (#29) by @norkunas
+* a7bd13d chore: fix ci deprecations (#28) by @Chris53897, @Chris8934
+
 ## [v1.4.1](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.1)
 
 October 25th, 2023 - [v1.4.0...v1.4.1](https://github.com/zenstruck/mailer-test/compare/v1.4.0...v1.4.1)

@@ -6,6 +6,9 @@
 Alternative, opinionated helpers for testing emails sent with `symfony/mailer`. This package is
 an alternative to the FrameworkBundle's `MailerAssertionsTrait`.
 
+> [!TIP]
+> Want to watch a screencast 🎥 about it? Check out [symfonycasts.com/mailer-test](https://symfonycasts.com/mailer-test).
+
 ## Installation
 
 1. Install the library:

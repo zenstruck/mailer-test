@@ -1,87 +1,68 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:first\\(\\) should return T of Zenstruck\\\\Mailer\\\\Test\\\\TestEmail but returns Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\.$#"
+			message: '#^Trait Zenstruck\\Mailer\\Test\\Bridge\\Zenstruck\\Browser\\MailerExtension is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Bridge/Zenstruck/Browser/MailerExtension.php
+
+		-
+			message: '#^Trait Zenstruck\\Mailer\\Test\\InteractsWithMailer is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/InteractsWithMailer.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Mime\\Email\:\:attachPart\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/SentEmails.php
 
 		-
-			message: "#^Method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:last\\(\\) should return T of Zenstruck\\\\Mailer\\\\Test\\\\TestEmail but returns Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\.$#"
+			message: '#^Call to function method_exists\(\) with Symfony\\Component\\Mime\\Email and ''addPart'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/SentEmails.php
 
 		-
-			message: "#^Parameter \\#1 \\$filter of method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:where\\(\\) expects callable\\(Symfony\\\\Component\\\\Mime\\\\Email\\|Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\)\\: bool, Closure\\(Symfony\\\\Component\\\\Mime\\\\Email\\)\\: bool given\\.$#"
+			message: '#^Method Zenstruck\\Mailer\\Test\\SentEmails\:\:first\(\) should return T of Zenstruck\\Mailer\\Test\\TestEmail but returns Zenstruck\\Mailer\\Test\\TestEmail\.$#'
+			identifier: return.type
+			count: 1
+			path: src/SentEmails.php
+
+		-
+			message: '#^Method Zenstruck\\Mailer\\Test\\SentEmails\:\:last\(\) should return T of Zenstruck\\Mailer\\Test\\TestEmail but returns Zenstruck\\Mailer\\Test\\TestEmail\.$#'
+			identifier: return.type
+			count: 1
+			path: src/SentEmails.php
+
+		-
+			message: '#^Parameter \#1 \$filter of method Zenstruck\\Mailer\\Test\\SentEmails\:\:where\(\) expects callable\(Symfony\\Component\\Mime\\Email\|Zenstruck\\Mailer\\Test\\TestEmail\)\: bool, Closure\(Symfony\\Component\\Mime\\Email\)\: bool given\.$#'
+			identifier: argument.type
 			count: 7
 			path: src/SentEmails.php
 
 		-
-			message: "#^Parameter \\#1 \\$filter of method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:where\\(\\) expects callable\\(Symfony\\\\Component\\\\Mime\\\\Email\\|Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\)\\: bool, Closure\\(Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\)\\: bool given\\.$#"
+			message: '#^Parameter \#1 \$filter of method Zenstruck\\Mailer\\Test\\SentEmails\:\:where\(\) expects callable\(Symfony\\Component\\Mime\\Email\|Zenstruck\\Mailer\\Test\\TestEmail\)\: bool, Closure\(Zenstruck\\Mailer\\Test\\TestEmail\)\: bool given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/SentEmails.php
 
 		-
-			message: "#^Method Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\:\\:as\\(\\) should return T of Zenstruck\\\\Mailer\\\\Test\\\\TestEmail but returns \\$this\\(Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\)\\.$#"
+			message: '#^Call to function is_a\(\) with arguments class\-string\<T of Zenstruck\\Mailer\\Test\\TestEmail\>, ''Zenstruck\\\\Mailer\\\\Test\\\\TestEmail'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/TestEmail.php
 
 		-
-			message: "#^Parameter \\#1 \\$events of static method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:fromEvents\\(\\) expects Symfony\\\\Component\\\\Mailer\\\\Event\\\\MessageEvents, Symfony\\\\Component\\\\Mailer\\\\Event\\\\MessageEvents\\|null given\\.$#"
+			message: '#^Method Zenstruck\\Mailer\\Test\\TestEmail\:\:as\(\) should return T of Zenstruck\\Mailer\\Test\\TestEmail but returns \$this\(Zenstruck\\Mailer\\Test\\TestEmail\)\.$#'
+			identifier: return.type
+			count: 1
+			path: src/TestEmail.php
+
+		-
+			message: '#^Parameter \#1 \$events of static method Zenstruck\\Mailer\\Test\\SentEmails\:\:fromEvents\(\) expects Symfony\\Component\\Mailer\\Event\\MessageEvents, Symfony\\Component\\Mailer\\Event\\MessageEvents\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/TestMailer.php
-
-		-
-			message: "#^Cannot call method getBodyAsString\\(\\) on Symfony\\\\Component\\\\Mime\\\\Header\\\\HeaderInterface\\|null\\.$#"
-			count: 1
-			path: tests/Fixture/CustomTestEmail.php
-
-		-
-			message: "#^Call to method add\\(\\) on an unknown class Symfony\\\\Component\\\\Routing\\\\RouteCollectionBuilder\\.$#"
-			count: 2
-			path: tests/Fixture/Kernel.php
-
-		-
-			message: "#^Class Symfony\\\\Component\\\\Routing\\\\RouteCollectionBuilder not found\\.$#"
-			count: 1
-			path: tests/Fixture/Kernel.php
-
-		-
-			message: "#^Parameter \\$routes of method Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\Fixture\\\\Kernel\\:\\:configureRoutes\\(\\) has invalid type Symfony\\\\Component\\\\Routing\\\\RouteCollectionBuilder\\.$#"
-			count: 1
-			path: tests/Fixture/Kernel.php
-
-		-
-			message: "#^Access to an undefined static property Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\InteractsWithMailerTest\\:\\:\\$container\\.$#"
-			count: 2
-			path: tests/InteractsWithMailerTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$class of method Zenstruck\\\\Mailer\\\\Test\\\\SentEmails\\:\\:all\\(\\) expects class\\-string\\<Zenstruck\\\\Mailer\\\\Test\\\\TestEmail\\>, string given\\.$#"
-			count: 1
-			path: tests/InteractsWithMailerTest.php
-
-		-
-			message: "#^Access to an undefined static property Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\NonInteractsWithMailerTest\\:\\:\\$container\\.$#"
-			count: 1
-			path: tests/NonInteractsWithMailerTest.php
-
-		-
-			message: "#^Access to an undefined static property Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\NonKernelTestCaseTest\\:\\:\\$booted\\.$#"
-			count: 1
-			path: tests/NonKernelTestCaseTest.php
-
-		-
-			message: "#^Access to an undefined static property Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\NonKernelTestCaseTest\\:\\:\\$container\\.$#"
-			count: 1
-			path: tests/NonKernelTestCaseTest.php
-
-		-
-			message: "#^Call to an undefined static method Zenstruck\\\\Mailer\\\\Test\\\\Tests\\\\NonKernelTestCaseTest\\:\\:getContainer\\(\\)\\.$#"
-			count: 1
-			path: tests/NonKernelTestCaseTest.php
-
-		-
-			message: "#^Call to function method_exists\\(\\) with 'Zenstruck\\\\\\\\Mailer\\\\\\\\Test\\\\\\\\Tests\\\\\\\\NonKernelTestCaseTest' and 'getContainer' will always evaluate to false\\.$#"
-			count: 1
-			path: tests/NonKernelTestCaseTest.php
 

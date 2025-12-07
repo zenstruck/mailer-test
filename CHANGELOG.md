@@ -1,8 +1,5 @@
 # CHANGELOG
 
-## [v1.4.3](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.3)
-* 7d539f6 feat: Symfony 8 support
-
 ## [v1.4.2](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.2)
 
 August 15th, 2024 - [v1.4.1...v1.4.2](https://github.com/zenstruck/mailer-test/compare/v1.4.1...v1.4.2)

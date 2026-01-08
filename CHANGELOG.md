@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [v1.5.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.5.0)
+
+January 8th, 2026 - [v1.4.2...v1.5.0](https://github.com/zenstruck/mailer-test/compare/v1.4.2...v1.5.0)
+
+* 002462f feat: allow symfony 8 (#32) by @Chris53897, @Chris8934, @kbond
+* 91755bf chore: update PHPStan 1 = 2 (#31) by @Chris53897, @Chris8934
+* ab86edd doc: add screencast link by @kbond
+* 5f26ef2 minor: fix test deprecations (#30) by @kbond
+
 ## [v1.4.2](https://github.com/zenstruck/mailer-test/releases/tag/v1.4.2)
 
 August 15th, 2024 - [v1.4.1...v1.4.2](https://github.com/zenstruck/mailer-test/compare/v1.4.1...v1.4.2)

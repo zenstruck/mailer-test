@@ -122,42 +122,42 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     public function whereSubject(string $subject): self
     {
-        return $this->where(fn(Email $email) => $email->getSubject() === $subject);
+        return $this->where(static fn(Email $email) => $email->getSubject() === $subject);
     }
 
     public function whereSubjectContains(string $needle): self
     {
-        return $this->where(fn(Email $email) => \str_contains((string) $email->getSubject(), $needle));
+        return $this->where(static fn(Email $email) => \str_contains((string) $email->getSubject(), $needle));
     }
 
     public function whereTag(string $tag): self
     {
-        return $this->where(fn(TestEmail $email) => $email->tag() === $tag);
+        return $this->where(static fn(TestEmail $email) => $email->tag() === $tag);
     }
 
     public function whereFrom(string $email): self
     {
-        return $this->where(fn(Email $message) => self::emailsContain($message->getFrom(), $email));
+        return $this->where(static fn(Email $message) => self::emailsContain($message->getFrom(), $email));
     }
 
     public function whereTo(string $email): self
     {
-        return $this->where(fn(Email $message) => self::emailsContain($message->getTo(), $email));
+        return $this->where(static fn(Email $message) => self::emailsContain($message->getTo(), $email));
     }
 
     public function whereCc(string $email): self
     {
-        return $this->where(fn(Email $message) => self::emailsContain($message->getCc(), $email));
+        return $this->where(static fn(Email $message) => self::emailsContain($message->getCc(), $email));
     }
 
     public function whereBcc(string $email): self
     {
-        return $this->where(fn(Email $message) => self::emailsContain($message->getBcc(), $email));
+        return $this->where(static fn(Email $message) => self::emailsContain($message->getBcc(), $email));
     }
 
     public function whereReplyTo(string $email): self
     {
-        return $this->where(fn(Email $message) => self::emailsContain($message->getReplyTo(), $email));
+        return $this->where(static fn(Email $message) => self::emailsContain($message->getReplyTo(), $email));
     }
 
     public function dump(): self

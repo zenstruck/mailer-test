@@ -70,10 +70,10 @@ final class TestEmailTest extends TestCase
         $withTags->assertHasTag('foo');
         $withTags->assertHasTag('bar');
 
-        Assert::that(fn() => $withTags->assertHasTag('baz'))->throws(
+        Assert::that(static fn() => $withTags->assertHasTag('baz'))->throws(
             AssertionFailedError::class, 'Expected to have tag "baz".',
         );
-        Assert::that(fn() => (new TestEmail(new Email()))->assertHasTag('foo'))->throws(
+        Assert::that(static fn() => (new TestEmail(new Email()))->assertHasTag('foo'))->throws(
             AssertionFailedError::class, 'No tags found.',
         );
     }
@@ -90,13 +90,13 @@ final class TestEmailTest extends TestCase
         $withMetadata->assertHasMetadata('color');
         $withMetadata->assertHasMetadata('color', 'blue');
 
-        Assert::that(fn() => $withMetadata->assertHasMetadata('color', 'red'))->throws(
+        Assert::that(static fn() => $withMetadata->assertHasMetadata('color', 'red'))->throws(
             AssertionFailedError::class, 'Expected metadata "color" to be "red".',
         );
-        Assert::that(fn() => $withMetadata->assertHasMetadata('foo'))->throws(
+        Assert::that(static fn() => $withMetadata->assertHasMetadata('foo'))->throws(
             AssertionFailedError::class, 'Expected to have metadata key "foo"',
         );
-        Assert::that(fn() => (new TestEmail(new Email()))->assertHasMetadata('foo'))->throws(
+        Assert::that(static fn() => (new TestEmail(new Email()))->assertHasMetadata('foo'))->throws(
             AssertionFailedError::class, 'No metadata found.',
         );
     }

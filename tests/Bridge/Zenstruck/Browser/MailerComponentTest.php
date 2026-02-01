@@ -33,13 +33,13 @@ final class MailerComponentTest extends KernelTestCase
             ->withProfiling()
             ->visit('/no-email')
             ->assertSuccessful()
-            ->use(function(MailerComponent $component) {
+            ->use(static function(MailerComponent $component) {
                 $component->assertNoEmailSent();
             })
             ->withProfiling()
             ->visit('/send-email')
             ->assertSuccessful()
-            ->use(function(MailerComponent $component) {
+            ->use(static function(MailerComponent $component) {
                 $component
                     ->assertSentEmailCount(1)
                     ->assertEmailSentTo('kevin@example.com', 'email subject')

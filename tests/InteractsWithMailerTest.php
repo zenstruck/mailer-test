@@ -145,7 +145,7 @@ final class InteractsWithMailerTest extends KernelTestCase
 
         self::getContainer()->get('mailer')->send($email);
 
-        $this->mailer()->assertEmailSentTo('kevin@example.com', function(CustomTestEmail $email) {
+        $this->mailer()->assertEmailSentTo('kevin@example.com', static function(CustomTestEmail $email) {
             $email->assertHasPostmarkTag('reset-password');
         });
     }
@@ -312,12 +312,12 @@ final class InteractsWithMailerTest extends KernelTestCase
                 // TestEmail can call underlying Symfony\Component\Mime\Email methods
                 $this->assertSame('Kevin', $email->getTo()[0]->getName());
             })
-            ->assertEmailSentTo('text@example.com', function(TestEmail $email) {
+            ->assertEmailSentTo('text@example.com', static function(TestEmail $email) {
                 $email
                     ->assertTextContains('some text')
                 ;
             })
-            ->assertEmailSentTo('html@example.com', function(TestEmail $email) {
+            ->assertEmailSentTo('html@example.com', static function(TestEmail $email) {
                 $email
                     ->assertHtmlContains('some html')
                 ;

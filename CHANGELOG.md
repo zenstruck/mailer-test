@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [v1.6.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.6.0)
+
+November 13th, 2026 - [v1.5.0...v1.6.0](https://github.com/zenstruck/mailer-test/compare/v1.5.0...v1.6.0)
+
+* 22c51a6 fix: restore PHPStan compatibility (#33) by @kbond
+* 24c1b38 fix: preserve directly sent emails when using a queue (#33) by @kbond
+* b283576 feat: collect queued Notifier emails (#33) by @kbond
+
 ## [v1.5.0](https://github.com/zenstruck/mailer-test/releases/tag/v1.5.0)
 
 January 8th, 2026 - [v1.4.2...v1.5.0](https://github.com/zenstruck/mailer-test/compare/v1.4.2...v1.5.0)

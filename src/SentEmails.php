@@ -22,6 +22,7 @@ use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\RawMessage;
 use Zenstruck\Assert;
+use Zenstruck\Mailer\Test\Tracking\TrackingEnvelope;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -40,21 +41,12 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     public static function fromEvents(MessageEvents $events): self
     {
-        $usingQueue = false;
-        $events = $events->getEvents();
+        $collected = [];
+        $events = \array_filter($events->getEvents(), static function(MessageEvent $event) use (&$collected): bool {
+            $envelope = $event->getEnvelope();
 
-        foreach ($events as $event) {
-            if ($event->isQueued()) {
-                $usingQueue = true;
-
-                break;
-            }
-        }
-
-        if ($usingQueue) {
-            // if using queue, remove non queued messages to avoid duplicates
-            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
-        }
+            return !$envelope instanceof TrackingEnvelope || $envelope->collectOnce($collected);
+        });
 
         // convert events to messages
         $messages = \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events);
@@ -79,7 +71,10 @@ final class SentEmails implements \IteratorAggregate, \Countable
      */
     public function first(string $class = TestEmail::class): TestEmail
     {
-        return $this->ensureSome()->all($class)[\array_key_first($this->emails)];
+        $this->ensureSome();
+        $key = \array_key_first($this->emails);
+
+        return $this->all($class)[$key];
     }
 
     /**
@@ -93,7 +88,10 @@ final class SentEmails implements \IteratorAggregate, \Countable
      */
     public function last(string $class = TestEmail::class): TestEmail
     {
-        return $this->ensureSome()->all($class)[\array_key_last($this->emails)];
+        $this->ensureSome();
+        $key = \array_key_last($this->emails);
+
+        return $this->all($class)[$key];
     }
 
     /**
@@ -212,6 +210,8 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     /**
      * @param array<string|int,mixed> $context
+     *
+     * @phpstan-assert non-empty-array<TestEmail> $this->emails
      */
     public function ensureSome(string $message = 'No emails.', array $context = []): self
     {
@@ -263,7 +263,10 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
         foreach (self::textParts($body) as $part) {
             match (true) {
-                $part instanceof DataPart => \method_exists($email, 'addPart') ? $email->addPart($part) : $email->attachPart($part),
+                // @phpstan-ignore function.alreadyNarrowedType (Older Mime versions use attachPart().)
+                $part instanceof DataPart && \method_exists($email, 'addPart') => $email->addPart($part),
+                // @phpstan-ignore function.impossibleType (Older Mime versions use attachPart().)
+                $part instanceof DataPart && \method_exists($email, 'attachPart') => $email->attachPart($part),
                 'plain' === $part->getMediaSubtype() => $email->text($part->getBody()),
                 'html' === $part->getMediaSubtype() => $email->html($part->getBody()),
                 default => null,

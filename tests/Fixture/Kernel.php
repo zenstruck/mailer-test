@@ -15,6 +15,8 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\ScopedEventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
@@ -51,6 +53,13 @@ final class Kernel extends BaseKernel
     private function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $loader->load(\sprintf('%s/config/%s.yaml', __DIR__, $this->getEnvironment()));
+
+        if (\class_exists(ScopedEventDispatcher::class)) {
+            $c->register('test.scoped_event_dispatcher', ScopedEventDispatcher::class)
+                ->setDecoratedService('event_dispatcher')
+                ->setArguments([new Reference('test.scoped_event_dispatcher.inner')])
+            ;
+        }
     }
 
     private function configureRoutes(RoutingConfigurator $routes): void

@@ -13,18 +13,6 @@ parameters:
 			path: src/InteractsWithMailer.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Mime\\Email\:\:attachPart\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/SentEmails.php
-
-		-
-			message: '#^Call to function method_exists\(\) with Symfony\\Component\\Mime\\Email and ''addPart'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/SentEmails.php
-
-		-
 			message: '#^Method Zenstruck\\Mailer\\Test\\SentEmails\:\:first\(\) should return T of Zenstruck\\Mailer\\Test\\TestEmail but returns Zenstruck\\Mailer\\Test\\TestEmail\.$#'
 			identifier: return.type
 			count: 1

@@ -3,6 +3,7 @@ imports:
 
 framework:
     messenger:
+        enabled: true
         transports:
             async: in-memory://
         routing:

@@ -1,0 +1,10 @@
+imports:
+    - { resource: test.yaml }
+
+services:
+    Symfony\Component\Notifier\NotifierInterface:
+        alias: notifier
+        public: true
+
+framework:
+    notifier: true

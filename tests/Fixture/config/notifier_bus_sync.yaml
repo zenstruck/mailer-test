@@ -1,0 +1,5 @@
+imports:
+    - { resource: notifier.yaml }
+
+framework:
+    messenger: true

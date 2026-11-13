@@ -76,6 +76,10 @@ class MyTest extends KernelTestCase // or WebTestCase
 **NOTE**: Emails are persisted between kernel reboots within each test. You can reset the
 collected emails with `$this->mailer()->reset()`.
 
+Emails sent through Symfony Notifier are collected before their Messenger transport is
+processed. The bundle preserves the configured Notifier bus, so notification emails
+can be asserted without consuming the queue.
+
 ### SentEmails Collection
 
 You can access all the sent emails and filter down to just the ones you want to make assertions on.

@@ -1,0 +1,13 @@
+imports:
+    - { resource: notifier_bus_async.yaml }
+
+framework:
+    notifier:
+        message_bus: notifier.bus
+    mailer:
+        message_bus: mailer.bus
+    messenger:
+        default_bus: mailer.bus
+        buses:
+            mailer.bus: ~
+            notifier.bus: ~

@@ -1,0 +1,10 @@
+imports:
+    - { resource: notifier.yaml }
+
+framework:
+    messenger:
+        enabled: true
+        transports:
+            async: in-memory://
+        routing:
+            Symfony\Component\Mailer\Messenger\SendEmailMessage: async

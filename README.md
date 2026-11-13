@@ -80,6 +80,11 @@ Emails sent through Symfony Notifier are collected before their Messenger transp
 processed. The bundle preserves the configured Notifier bus, so notification emails
 can be asserted without consuming the queue.
 
+Queued and directly delivered emails can be asserted together. When the queue is
+processed, each send is counted once, even if separate sends have identical contents.
+The bundle tracks sends internally through their Mailer envelopes; email headers
+and bodies are unchanged.
+
 ### SentEmails Collection
 
 You can access all the sent emails and filter down to just the ones you want to make assertions on.

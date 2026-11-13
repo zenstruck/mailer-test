@@ -1,0 +1,9 @@
+imports:
+    - { resource: bus_async.yaml }
+
+framework:
+    messenger:
+        transports:
+            async:
+                dsn: 'in-memory://?serialize=true'
+                serializer: messenger.transport.native_php_serializer

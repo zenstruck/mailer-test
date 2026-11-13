@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Zenstruck\Mailer\Test\Bridge\Symfony\Notifier\EmailMessageBus;
+use Zenstruck\Mailer\Test\Tracking\EmailEventTracker;
+use Zenstruck\Mailer\Test\Tracking\TrackingMailer;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -45,6 +47,15 @@ final class ZenstruckMailerTestBundle extends Bundle implements CompilerPassInte
         if (!$container->has('mailer.mailer') || $container->hasDefinition('zenstruck_mailer_test.notifier_email_bus')) {
             return;
         }
+
+        $container->register('zenstruck_mailer_test.tracking_mailer', TrackingMailer::class)
+            ->setDecoratedService('mailer.mailer')
+            ->setArguments([new Reference('zenstruck_mailer_test.tracking_mailer.inner')])
+        ;
+        $container->register('zenstruck_mailer_test.email_event_tracker', EmailEventTracker::class)
+            ->addTag('kernel.event_listener', ['event' => MessageEvent::class, 'method' => 'prepare', 'priority' => \PHP_INT_MAX])
+            ->addTag('kernel.event_listener', ['event' => MessageEvent::class, 'method' => 'finish', 'priority' => \PHP_INT_MIN])
+        ;
 
         if (!$container->hasDefinition('notifier.channel.email')) {
             return;

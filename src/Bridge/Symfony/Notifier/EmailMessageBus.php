@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Zenstruck\Mailer\Test\Tracking\TrackingEnvelope;
 
 /**
  * @internal
@@ -40,7 +41,12 @@ final class EmailMessageBus implements MessageBusInterface
             return $this->bus->dispatch($envelope);
         }
 
-        if ($envelope->last(CollectedEmailStamp::class)) {
+        $stamp = $envelope->last(CollectedEmailStamp::class);
+        $tracking = ($stamp ?? new CollectedEmailStamp())->envelope($email);
+        $email = new SendEmailMessage($email->getMessage(), $tracking);
+        $envelope = new Envelope($email, \array_merge([], ...\array_values($envelope->all())));
+
+        if ($stamp) {
             return $this->bus->dispatch($envelope);
         }
 
@@ -59,7 +65,8 @@ final class EmailMessageBus implements MessageBusInterface
     {
         // @phpstan-ignore function.alreadyNarrowedType (Older Mailer versions do not support event stamps.)
         if ($event->isQueued() && \method_exists($event, 'addStamp')) {
-            $event->addStamp(new CollectedEmailStamp());
+            $envelope = $event->getEnvelope();
+            $event->addStamp(new CollectedEmailStamp($envelope instanceof TrackingEnvelope ? $envelope : null));
         }
     }
 

@@ -22,6 +22,7 @@ use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\RawMessage;
 use Zenstruck\Assert;
+use Zenstruck\Mailer\Test\Tracking\TrackingEnvelope;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -40,21 +41,12 @@ final class SentEmails implements \IteratorAggregate, \Countable
 
     public static function fromEvents(MessageEvents $events): self
     {
-        $usingQueue = false;
-        $events = $events->getEvents();
+        $collected = [];
+        $events = \array_filter($events->getEvents(), static function(MessageEvent $event) use (&$collected): bool {
+            $envelope = $event->getEnvelope();
 
-        foreach ($events as $event) {
-            if ($event->isQueued()) {
-                $usingQueue = true;
-
-                break;
-            }
-        }
-
-        if ($usingQueue) {
-            // if using queue, remove non queued messages to avoid duplicates
-            $events = \array_filter($events, static fn(MessageEvent $event) => $event->isQueued());
-        }
+            return !$envelope instanceof TrackingEnvelope || $envelope->collectOnce($collected);
+        });
 
         // convert events to messages
         $messages = \array_map(static fn(MessageEvent $event) => $event->getMessage(), $events);
